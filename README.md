@@ -25,7 +25,14 @@ UrDHT is composed of three major abstract modules which are meant to be easily r
 
 - DHT Logic Component
 	- The DHT logic component will be the primary focus
+	- This is where interesting stuff happens
 	- It will implement the basic DHT functions
 	- Design will leverage a metric space abstraction for DHTs
 	- Default implementation will utilize a finite euclidean plane use DGVH approximation for peer selection
-	
+
+
+
+- Publions
+	- The project itself
+	- VHash
+	- Mathematical formulation of DHTs
