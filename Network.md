@@ -3,9 +3,39 @@
 The Network component provides inter-Node communication and communication with clients (if they are supported). The methods that are exposed to the network may vary between implementations but the default REST API is described here.
 The ideal is that UrDHT based DHTs, implemented in different languages will be inter-operable utilizing a common network protocol
 
-## REST API
+## Internal API
 
-The rest API is broken into two sections:
+The Network Module provides the following procedures to other modules:
+
+```
+Seek(remote,id): sends a seek request for a given id to the remote node
+```
+
+```
+GetPeers(remote): sends a request for the peerlist of a given remote node
+```
+
+```
+Notify(remote,origin): sends a notify message to the remote node, informing it of origin
+```
+
+## Internal Dependencies
+
+The Network Module depends on the following methods from the DHT Logic and Database Modules
+
+DHT Logic:
+- seek(id)
+- getPeers()
+- getNotified(origin)
+- DoIOwn(id)
+
+Database:
+- put(id, value)
+- get(id)
+
+## External REST API
+
+The REST API is broken into two sections:
 - a client API suitable for use both by Servers and in client applications (even in the browser!)
 - a Peer only API that should only be used by other Nodes
 
@@ -16,7 +46,7 @@ checks the database of the Node and returns the value if found.
 
 {
 	recordFound:True,
-	record = "value"
+	record:"value"
 }
 
 
