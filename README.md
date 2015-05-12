@@ -12,11 +12,20 @@ It should take minimal effort to implement any existing DHTs (Chord, Kademlia, C
 UrDHT is composed of three major abstract modules which are meant to be easily replaceable
 
 - Network Component
-	The Network component manages connections with other Nodes and clients.
-	Replacement of this component will change the 
-	Default implementation is 
-
+	- The Network component manages connections with other Nodes and clients.
+	- Replacement of this component will change the network protocols used by the DHT
+	- Default implementation will utilize a http-rest interface
 
 - Database Component
+	- The database controls how values on the DHT are stored.
+	- For the purposes of our design this is the least important module
+	- Initial implementation will utilize a simple flatfile database. 
+	- This is intended to be replaced on a per-use-case basis
+	- Ideally Nodes in the same network could utilize different databases
 
 - DHT Logic Component
+	- The DHT logic component will be the primary focus
+	- It will implement the basic DHT functions
+	- Design will leverage a metric space abstraction for DHTs
+	- Default implementation will utilize a finite euclidean plane use DGVH approximation for peer selection
+	
