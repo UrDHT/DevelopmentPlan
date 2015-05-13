@@ -10,7 +10,7 @@ Development IRC Chat can be found at #UrDHT on irc.freenode.org
 
 WebClient: https://kiwiirc.com/client/irc.freenode.net/UrDHT
 
-#How is UrDHT organized?
+# How is UrDHT organized?
 
 UrDHT is composed of three major abstract modules which are meant to be easily replaceable
 
@@ -35,11 +35,7 @@ UrDHT is composed of three major abstract modules which are meant to be easily r
 
 
 
-- Initial Publions
-	- The project itself
-	- VHash
-	- Mathematical formulation of DHTs
-If you want to help development:
+# If you want to help development:
 
 - Pick a Bug or TODO issue (make one if you see the need)
 - checkout a new feature branch (of fork if you don't have repo access)
@@ -47,3 +43,9 @@ If you want to help development:
 - write a new test to test your feature or bug (testing methods will vary from project to project and language to language)
 - Use Github to open a pull request
 - Wait for a few days while we argue about your patch
+
+
+- Initial Publions
+	- The project itself
+	- VHash
+	- Mathematical formulation of DHTs
