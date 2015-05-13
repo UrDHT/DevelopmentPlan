@@ -19,7 +19,7 @@ UrDHT is composed of three major abstract modules which are meant to be easily r
 - Database Component
 	- The database controls how values on the DHT are stored.
 	- For the purposes of our design this is the least important module
-	- Initial implementation will utilize a simple flatfile database. 
+	- Initial implementation will utilize a simple flat-file database. 
 	- This is intended to be replaced on a per-use-case basis
 	- Ideally Nodes in the same network could utilize different databases
 
@@ -29,3 +29,17 @@ UrDHT is composed of three major abstract modules which are meant to be easily r
 	- Design will leverage a metric space abstraction for DHTs
 	- Default implementation will utilize a finite euclidean plane use DGVH approximation for peer selection
 
+#Development Guidelines
+
+UrDHT will initially be pushed in Python 3 and GoLang.
+The ideal is to produce many inter-compatible implementations in as many languages as are reasonable.
+
+Each new implantations (and later forks) will each be their own repository.
+If you want to help development:
+
+- Pick a Bug or TODO issue (make one if you see the need)
+- checkout a new feature branch (of fork if you don't have repo access)
+- implement feature or fix bug
+- write a new test to test your feature or bug (testing methods will vary from project to project and language to language)
+- Use Github to open a pull request
+- Wait for a few days while we argue about your patch
