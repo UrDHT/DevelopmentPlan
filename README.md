@@ -6,6 +6,9 @@ UrDHT alone is not meant to be usable alone (it may include a simple DHT impleme
 
 It should take minimal effort to implement any existing DHTs (Chord, Kademlia, CAN ect) using UrDHT and more usefully should allow for the easy design and implementation of novel DHTs.
 
+Development IRC Chat can be found at #UrDHT on irc.freenode.org
+
+WebClient: https://kiwiirc.com/client/irc.freenode.net/UrDHT
 
 #How is UrDHT organized?
 
