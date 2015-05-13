@@ -33,6 +33,10 @@ Database:
 - put(id, value)
 - get(id)
 
+Traditionally, DHTs have the following functions for an api:  lookup(key), get(key), put(key,val), and maybe delete.
+Lookup is often recursive, but it's easier to handle interative lookups, so we've create seek to help us with that
+
+
 ## External REST API
 
 The REST API is broken into two sections:
