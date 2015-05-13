@@ -6,6 +6,9 @@ UrDHT is not meant to be usable alone (it may include a simple DHT implementatio
 
 It should take minimal effort to implement any existing DHTs (Chord, Kademlia, CAN ect) using UrDHT and more usefully should allow for the easy design and implementation of novel DHTs.
 
+Development IRC Chat can be found at #UrDHT on irc.freenode.org
+
+WebClient: https://kiwiirc.com/client/irc.freenode.net/UrDHT
 
 #How is UrDHT organized?
 
@@ -25,16 +28,17 @@ UrDHT is composed of three major abstract modules which are meant to be easily r
 
 - DHT Logic Component
 	- The DHT logic component will be the primary focus
+	- This is where interesting stuff happens
 	- It will implement the basic DHT functions
 	- Design will leverage a metric space abstraction for DHTs
 	- Default implementation will utilize a finite euclidean plane use DGVH approximation for peer selection
 
-#Development Guidelines
 
-UrDHT will initially be pushed in Python 3 and GoLang.
-The ideal is to produce many inter-compatible implementations in as many languages as are reasonable.
 
-Each new implantations (and later forks) will each be their own repository.
+- Initial Publions
+	- The project itself
+	- VHash
+	- Mathematical formulation of DHTs
 If you want to help development:
 
 - Pick a Bug or TODO issue (make one if you see the need)
