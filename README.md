@@ -32,7 +32,7 @@ UrDHT is composed of three major abstract modules which are meant to be easily r
 	- It will implement the basic DHT functions
 	- Design will leverage a metric space abstraction for DHTs
 	- Default implementation will utilize a finite euclidean plane use DGVH approximation for peer selection
-
+        - This involves mathematical forumulation for distance, midpoint, and closeness, which is a publion in itself.
 
 
 # If you want to help development:
