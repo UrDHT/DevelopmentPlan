@@ -14,19 +14,19 @@ WebClient: https://kiwiirc.com/client/irc.freenode.net/UrDHT
 
 UrDHT is composed of three major abstract modules which are meant to be easily replaceable
 
-- Network Component
+- [Network Component]{./Network.md}
 	- The Network component manages connections with other Nodes and clients.
 	- Replacement of this component will change the network protocols used by the DHT
 	- Default implementation will utilize a http-rest interface
 
-- Database Component
+- [Database Component]{./Database.md}
 	- The database controls how values on the DHT are stored.
 	- For the purposes of our design this is the least important module
 	- Initial implementation will utilize a simple flat-file database. 
 	- This is intended to be replaced on a per-use-case basis
 	- Ideally Nodes in the same network could utilize different databases
 
-- DHT Logic Component
+- [DHT Logic Component]{./DHT_Logic.md}
 	- The DHT logic component will be the primary focus
 	- This is where interesting stuff happens
 	- It will implement the basic DHT functions
