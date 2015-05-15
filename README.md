@@ -45,7 +45,7 @@ UrDHT is composed of three major abstract modules which are meant to be easily r
 - Wait for a few days while we argue about your patch
 
 
-- Initial Publions
+## Initial Publions
 	- The project itself
 	- VHash
 	- Mathematical formulation of DHTs
