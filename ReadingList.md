@@ -7,11 +7,11 @@
 # Specific DHTs
 * Chord http://pdos.csail.mit.edu/papers/chord:sigcomm01/chord_sigcomm.pdf
 * CAN http://wortschatz.uni-leipzig.de/~fwitschel/vorlP2P/literatur/CAN.pdf
-* Pastry/Tapestry
-* Kademlia - http://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf
-* Symphony
-* ZHT
+* Pastry/Tapestry http://www.srhea.net/papers/tapestry_jsac.pdf
+* Kademlia  http://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf
+* Symphony http://infolab.stanford.edu/~bawa/Pub/symphony.pdf
+* ZHT http://datasys.cs.iit.edu/~dongfang/download/2013_IPDPS13_ZHT.pdf
 
 
 # Interesting Concept Papers: 
-Small World Routing - 
+Small World Routing http://www.cis.upenn.edu/~mkearns/teaching/NetworkedLife/nat00.pdf
