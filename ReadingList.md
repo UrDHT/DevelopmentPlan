@@ -17,3 +17,6 @@
 
 # Interesting Concept Papers: 
 Small World Routing http://www.cis.upenn.edu/~mkearns/teaching/NetworkedLife/nat00.pdf
+
+##Security
+A Survey of DHT Security Techniques http://disi.unitn.it/~montreso/ds/papers/DhtSecuritySurvey.pdf
