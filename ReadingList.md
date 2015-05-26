@@ -5,10 +5,10 @@
 
 
 # Specific DHTs
-* Chord
+* Chord http://pdos.csail.mit.edu/papers/chord:sigcomm01/chord_sigcomm.pdf
 * CAN
 * Pastry/Tapestry
-* Kademlia
+* Kademlia - http://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf
 * Symphony
 * ZHT
 
