@@ -11,6 +11,7 @@
 * Pastry/Tapestry http://www.srhea.net/papers/tapestry_jsac.pdf
 * Kademlia  http://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf
 * Symphony http://infolab.stanford.edu/~bawa/Pub/symphony.pdf
+* Viceroy http://www.cs.cornell.edu/courses/cs6452/2012sp/papers/viceroy.pdf
 * ZHT http://datasys.cs.iit.edu/~dongfang/download/2013_IPDPS13_ZHT.pdf
 
 
