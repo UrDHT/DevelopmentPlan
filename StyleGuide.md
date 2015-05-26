@@ -1,6 +1,8 @@
+# Python
 In python, adhere to PEP 8 
 https://www.python.org/dev/peps/pep-0008/
 
+# Go
 In go, go fmt  
 Done
 
