@@ -6,7 +6,7 @@
 
 # Specific DHTs
 * Chord http://pdos.csail.mit.edu/papers/chord:sigcomm01/chord_sigcomm.pdf
-* CAN
+* CAN http://wortschatz.uni-leipzig.de/~fwitschel/vorlP2P/literatur/CAN.pdf
 * Pastry/Tapestry
 * Kademlia - http://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf
 * Symphony
