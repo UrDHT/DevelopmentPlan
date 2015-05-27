@@ -21,9 +21,8 @@ Although a bit dated, it does provide a good deal of history along with the tech
 
 
 # Interesting Concept Papers: 
-Small World Routing http://www.cis.upenn.edu/~mkearns/teaching/NetworkedLife/nat00.pdf
-
-Complex Queries in DHT-based Peer-to-Peer Networks http://www.cs.berkeley.edu/~istoica/papers/2002/pier-iptps02.pdf
+* Small World Routing http://www.cis.upenn.edu/~mkearns/teaching/NetworkedLife/nat00.pdf
+* Complex Queries in DHT-based Peer-to-Peer Networks http://www.cs.berkeley.edu/~istoica/papers/2002/pier-iptps02.pdf
 
 
 ##Security
@@ -35,5 +34,5 @@ Informally, the attacker pretends to be multiple individual nodes.
 DHTs treat each individual node as equal members, so with enough identities, the attacker will intercept the majority of network traffic.
 From there, the adversary can eavesdrop on most of the messages, or skip the eaves and move straight on to the dropping.
 
-A Survey of DHT Security Techniques http://disi.unitn.it/~montreso/ds/papers/DhtSecuritySurvey.pdf
-The Sybil Attack http://freehaven.net/anonbib/cache/sybil.pdf
+* A Survey of DHT Security Techniques http://disi.unitn.it/~montreso/ds/papers/DhtSecuritySurvey.pdf
+* The Sybil Attack http://freehaven.net/anonbib/cache/sybil.pdf
