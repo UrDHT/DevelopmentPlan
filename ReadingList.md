@@ -23,3 +23,4 @@ Complex Queries in DHT-based Peer-to-Peer Networks http://www.cs.berkeley.edu/~i
 
 ##Security
 A Survey of DHT Security Techniques http://disi.unitn.it/~montreso/ds/papers/DhtSecuritySurvey.pdf
+The Sybil Attack http://freehaven.net/anonbib/cache/sybil.pdf
