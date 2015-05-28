@@ -20,7 +20,7 @@ In our highly biased opinion Chord and Kademlia are the most important DHT paper
 * Symphony http://infolab.stanford.edu/~bawa/Pub/symphony.pdf
 * Viceroy http://www.cs.cornell.edu/courses/cs6452/2012sp/papers/viceroy.pdf
 * ZHT http://datasys.cs.iit.edu/~dongfang/download/2013_IPDPS13_ZHT.pdf
-
+* Coral http://iptps03.cs.berkeley.edu/final-papers/coral.pdf
 
 # Interesting Concept Papers: 
 * Small World Routing http://www.cis.upenn.edu/~mkearns/teaching/NetworkedLife/nat00.pdf
