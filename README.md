@@ -40,7 +40,7 @@ UrDHT is composed of three major abstract modules which are meant to be easily r
 
 # If you want to help development:
 
-- Follow the style guide for consistency! (./StyleGuide.md)
+- Follow the style guide for consistency! [StyleGuide] (./StyleGuide.md)
 - Pick a Bug or TODO issue (make one if you see the need)
 - checkout a new feature branch (of fork if you don't have repo access)
 - implement feature or fix bug
