@@ -2,9 +2,11 @@
 
 UrDHT is an abstract implementation of a DHT that allows programmers to have a strong base for implementing DHTs in Decentralized systems.
 
-UrDHT is not meant to be usable alone (it may include a simple DHT implementation), but is intended to be forked and converted into many more useful DHTs. 
+UrDHT is not meant to be usable alone (it may include a simple DHT implementation), but is intended to be forked and converted into many more useful DHTs.
 
 It should take minimal effort to implement any existing DHTs (Chord, Kademlia, CAN ect) using UrDHT and more usefully should allow for the easy design and implementation of novel DHTs.
+
+UrDHT does not implement the protocol of any particular DHT.  It can, however, implemnent the *topology.* 
 
 UrDHT's name comes from the Germanic prefix *ur*, meaning proto- or primitive or original.
 We wanted to express that UrDHT is the DHT that can be used to build any other DHT.
