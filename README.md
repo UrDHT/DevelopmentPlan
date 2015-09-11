@@ -6,7 +6,7 @@ UrDHT is not meant to be usable alone (it may include a simple DHT implementatio
 
 It should take minimal effort to implement any existing DHTs (Chord, Kademlia, CAN ect) using UrDHT and more usefully should allow for the easy design and implementation of novel DHTs.
 
-UrDHT does not implement the protocol of any particular DHT.  It can, however, implemnent the *topology.* 
+UrDHT does not implement the protocol of any particular DHT.  It can, however, implement the *topology.* 
 
 UrDHT's name comes from the Germanic prefix *ur*, meaning proto- or primitive or original.
 We wanted to express that UrDHT is the DHT that can be used to build any other DHT.
