@@ -34,44 +34,51 @@
 \section{Introduction}
 
 Distributed Hash Tables have been extensively researched for the past decade.
-Despite this, no one has created a cohesive specification for what a DHT is. % or something
+Despite this, no one has created a cohesive formal specification for building a DHT. % or something
 
 
 UrDHT is our specification and implementation of an abstract DHT.
-UrDHT uses a single 
 
 
 %TODO DO THIS FIRST
 \begin{itemize}
 	\item We first discuss our motivation for creating UrDHT and \textit{creating it the way we did}  (Section \ref{sec:motivation}).
-	\item We
+	\item We give a formal specification for what needs to be defined for a DHT.  
+	These attributes have not been formally defined. (Section \ref{sec:define})
+	\item We present UrDHT as an abstract DHT and show how a developer can tweak the functions we defined to create new DHT topologies.
+	We show how to reproduce the topology of Chord and Kademlia using UrDHT, which we call UrChord and UrKademlia.
+	\item We conduct experiments showing that UrChord sufficiently approximates a correct implementation of Chord.
 \end{itemize}
 
 \section{Motivation}
 \label{sec:motivation}
 
 \section{What Defines a DHT}
+\label{sec:define}
 
-A DHT requires the following functions
+A distributed hash table provides the following API to the user
+
 
 \begin{description}
-	\item[A \texttt{distance} function] \qquad
+	\item [A \texttt{distance} function] \qquad
 	This measures distance in the overlay formed by the Distributed Hash Table.
 	In most DHTs, the distance in the overlay has no correlation with real-world attributes.
 	This is not the case with UrDHT (see Section \ref{sec:hyper}).
 	
-	\item[A \texttt{midpoint} function]  % Is this part of ownership?
-	\item[An \texttt{ownership} definition]
+	\item [A \texttt{midpoint} function]  % Is this part of ownership?
+	\item [An \texttt{ownership} definition]
 \end{description}
 
 
 A DHT also needs a strategy to organize and maintain two lists of peers: \textit{short peers} and \textit{long peers}.
-Short peers 
-These define the topology of the network and guarantee that greedy routing works.
+Short peers are the set of peers that define the topology of the network and guarantee that greedy routing works.
 
-Long peers allow the DHT 
+Long peers allow the DHT to achieve a better than linear lookup time, 
+
+Interestingly, despite the diversity of DHT topologies, all DHTs use the relatively the greedy routing algorithm:
+
 \section{UrDHT}
-
+\label{sec:urdht}
 	\subsection{UrDHT Components (or maybe logic)}
 	
 	UrDHT is sectioned off into 3 components: database, network, and logic.
@@ -82,11 +89,18 @@ Long peers allow the DHT
 	\label{sec:hyper}
 	
 	\subsection{Implementing Chord and Ring Based Topology}
+	
+	
 	\subsection{Implementing Kademlia and Other Tree Based Topologies}
 	
+	
+	Trees are easy to embed in a hyperbolic space.
 	\subsection{ZHT}
+	
 \section{Experiments}
+\label{sec:experiments}
 
 \section{Future Work and Conclusions}
+\label{sec:future}
 
 \end{document}
