@@ -53,6 +53,20 @@ UrDHT is our specification and implementation of an abstract DHT.
 \section{Motivation}
 \label{sec:motivation}
 
+Distributed Hash Tables have been the catalyst for the creation of many P2P applications.
+Among these are example 1, example 2, another citation, citation, and, most notably, BitTorrent \cite{bittorrent}.  %TODO Add actual citations
+
+One issue in the adoption of new P2P applications is the bootstrapping problem.
+A node can only join the network if it knows another node \textit{that is already a member of the network it is trying to join.}
+
+
+The other motivation is making it easier for users to create distributed applications.
+What topology do you use?
+How do we want our program to communicate over the network?
+
+
+UrDHT exists to simplify this process, minimizing the distributed application development time and making it easier to adopt by creating a network to bootstrap \textit{other networks}.
+
 \section{What Defines a DHT}
 \label{sec:define}
 
@@ -92,8 +106,6 @@ Interestingly, despite the diversity of DHT topologies, all DHTs use the relativ
 	
 	
 	\subsection{Implementing Kademlia and Other Tree Based Topologies}
-	
-	
 	Trees are easy to embed in a hyperbolic space.
 	\subsection{ZHT}
 	
@@ -102,5 +114,8 @@ Interestingly, despite the diversity of DHT topologies, all DHTs use the relativ
 
 \section{Future Work and Conclusions}
 \label{sec:future}
+
+\bibliography{mine,dht}
+\bibliographystyle{plain}
 
 \end{document}
