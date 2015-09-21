@@ -53,11 +53,11 @@ UrDHT is our specification and implementation of an abstract DHT.
 \begin{itemize}
 	\item We first discuss our motivation for creating UrDHT and \textit{creating it the way we did}  (Section \ref{sec:motivation}).
 	\item We give a formal specification for what needs to be defined for a DHT.
-	While there has long existed a well known API for distributed hash tables, these define what a DHT needs to be able to do.
+	While there has long existed a well known protocol for distributed hash tables, these define what a DHT needs to be able to do.
 	It does not describe what a DHT is.
 	We define a set of simple functions that are needed to implement a DHT.
-	We show that using these functions, DHTs cleanly map to Delaunay triangulations and Voronoi tessellations (Section \ref{sec:define}).
-	\item We present UrDHT as an abstract DHT and show how a developer can tweak the functions we defined to create new DHT topologies.
+	We show that using these functions, DHTs cleanly map to the primal-dual problem of Delaunay triangulations and Voronoi tessellations (Section \ref{sec:define}).
+	\item We present UrDHT as an abstract DHT and show how a developer can tweak the functions we defined to create an arbitrary new DHT topology.
 	We show how to reproduce the topology of Chord and Kademlia using UrDHT, which we call UrChord and UrKademlia.
 	\item We conduct experiments showing that UrChord sufficiently approximates a correct implementation of Chord.
 \end{itemize}
@@ -86,11 +86,13 @@ UrDHT exists to simplify this process, minimizing the distributed application de
 
 \subsection{Abstraction}
 
+We've see that CHord doesn't work
+
 \section{What Defines a DHT}
 \label{sec:define}
 
-A distributed hash table is usually defined by its API; in other words, what it can do.
-Nodes and data in a distributed hash table are assigned unique\footnote{Unique with astronomically high probability, given a large enough consistant hash algorithm.} keys via a consistent hashing algorithm.
+A distributed hash table is usually defined by its protocol; in other words, what it can do.
+Nodes and data in a distributed hash table are assigned unique\footnote{Unique with astronomically high probability, given a large enough consistent hash algorithm.} keys via a consistent hashing algorithm.
 To make it easier to grok the context, we will call the key associated with a node its ID and refer to  nodes and their IDs interchangeably.
 
 A DHT can perform the \texttt{lookup(key)}, \texttt{get(key)}, and \texttt{store(key, value)} operations. \footnote{There is typically a \textit{delete(key)} operation defined too, but it is not strictly necessary.}.
@@ -110,6 +112,7 @@ The following functions need to be defined in order for nodes to perform lookup 
 	This is not necessarily the case with UrDHT (see Section \ref{sec:hyper}).
 	
 	\item \textbf{A \texttt{midpoint} function} - The .
+	The midpoint is required for Delaunay triangulation calculation.
 	In some spaces, such as Kademlia's XOR metric space, this can be tricky to calculate.  % Is this part of ownership?
 	\item \textbf{An \texttt{responsibility} definition}  This defines the range of keys a node is responsible for. 
 	Not every DHT defines which node is responsible for particular keys in the same way. 
@@ -208,6 +211,7 @@ We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH) \ci
 \section{Experiments}
 \label{sec:experiments}
 
+%TODO show DGVH is the bomb in 1D cause 1D is easy
 \section{Future Work and Conclusions}
 \label{sec:future}
 
