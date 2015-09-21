@@ -6,6 +6,13 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 
+
+\usepackage{subcaption}
+%\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+\usepackage{algorithm} 
+\usepackage{algorithmic}
+\usepackage[font=small]{caption}
+
 \title{UrDHT: A Unified Model for Distributed Hash Tables}
 
 
@@ -22,18 +29,20 @@
 
 \begin{document}
 \maketitle
-%TODO:  Actual number of functions
+%TODO Actual number of functions
 \begin{abstract}
 	UrDHT is an abstracted Distributed Hash Table (DHT).
 	By completing a few simple functions, a developer can implement the topology of any DHT.
 	
-	Current distributed systems suffer  from fragmentation , high overhead and inability to scale due to difficulty of adoption.
+	Current distributed systems suffer from fragmentation, high overhead, and an inability to scale due to difficulty of adoption.
 	UrDHT is P2P system designed to improve the adaptability of P2P distributed serves.
 \end{abstract}
 
 \section{Introduction}
 
 Distributed Hash Tables have been extensively researched for the past decade.
+%What is a DHT
+% Mention the DHT API
 Despite this, no one has created a cohesive formal specification for building a DHT. % or something
 
 
@@ -43,8 +52,11 @@ UrDHT is our specification and implementation of an abstract DHT.
 %TODO DO THIS FIRST
 \begin{itemize}
 	\item We first discuss our motivation for creating UrDHT and \textit{creating it the way we did}  (Section \ref{sec:motivation}).
-	\item We give a formal specification for what needs to be defined for a DHT.  
-	These attributes have not been formally defined. (Section \ref{sec:define})
+	\item We give a formal specification for what needs to be defined for a DHT.
+	While there has long existed a well known API for distributed hash tables, these define what a DHT needs to be able to do.
+	It does not describe what a DHT is.
+	We define a set of simple functions that are needed to implement a DHT.
+	We show that using these functions, DHTs cleanly map to Delaunay triangulations and Voronoi tessellations (Section \ref{sec:define}).
 	\item We present UrDHT as an abstract DHT and show how a developer can tweak the functions we defined to create new DHT topologies.
 	We show how to reproduce the topology of Chord and Kademlia using UrDHT, which we call UrChord and UrKademlia.
 	\item We conduct experiments showing that UrChord sufficiently approximates a correct implementation of Chord.
@@ -56,6 +68,8 @@ UrDHT is our specification and implementation of an abstract DHT.
 Distributed Hash Tables have been the catalyst for the creation of many P2P applications.
 Among these are example 1, example 2, another citation, citation, and, most notably, BitTorrent \cite{bittorrent}.  %TODO Add actual citations
 
+
+\subsection{Bootstrapping}
 One issue in the adoption of new P2P applications is the bootstrapping problem.
 A node can only join the network if it knows another node \textit{that is already a member of the network it is trying to join.}
 
@@ -66,6 +80,11 @@ How do we want our program to communicate over the network?
 
 
 UrDHT exists to simplify this process, minimizing the distributed application development time and making it easier to adopt by creating a network to bootstrap \textit{other networks}.
+
+\subsection{Embedding}
+
+
+\subsection{Abstraction}
 
 \section{What Defines a DHT}
 \label{sec:define}
@@ -125,10 +144,44 @@ With the following components of a DHT defined above we can now show the relatio
 We can map a nodes ID to a point in a space, the range of keys a node is responsible for to that nodes Voronoi region, and the set of short peers to the Delaunay triangulation.
 Thus, if we can calculate the Delaunay triangulation between nodes in a DHT, we have a generalized means of created the overlay network.
 
-So how do we efficiently calculate Delaunay Triangulations in a distributed system?
-We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH).
 
-%TODO LONG PEERS DEFINE THE SPACE TOO IN URDHT  HOW DOES THAT CHANGE IN CHORD?
+So how do we efficiently calculate Delaunay Triangulations in a distributed system?
+We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH) \cite{dgvh}, shown in Algorithm \ref{alg:dgvh}.
+
+
+\begin{algorithm} % make smaller
+	\caption{Distributed Greedy Voronoi Heuristic}
+	\label{alg:dgvh}
+	\algsetup{linenosize=\tiny}
+	\scriptsize
+	\begin{algorithmic}[1]  % the numberis how many lines
+		\STATE Given node $n$ and its list of $candidates$.
+		\STATE Given the minimum $table\_size$
+		\STATE $short\_peers \leftarrow$ empty set that will contain $n$'s one-hop peers
+		\STATE $long\_peers \leftarrow$ empty set that will contain $n$'s peers further than one hop.
+		\STATE Sort $candidates$ in ascending order by each node's \texttt{distance} to $n$
+		\STATE Remove the first member of $candidates$ and add it to $short\_peers$
+		\FORALL{$c$ in $candidates$}
+			\STATE $m$ $ \leftarrow $ \texttt{midpoint}$( n, c )$
+			\IF{any node in $short\_peers$ is closer to $m$ than $n$}
+				\STATE Reject $c$ as a peer
+			\ELSE
+				\STATE Remove $c$ from $candidates$
+				\STATE Add $c$ to $short\_peers$
+			\ENDIF
+		\ENDFOR
+		\WHILE{$|short\_peers| < table\_size$ \AND $|candidates| >0$}
+			\STATE Remove the first entry $c$ from $candidates$
+			\STATE Add $c$ to $short\_peers$
+		\ENDWHILE
+		\STATE Add $candidates$ to the set of $long\_peers$	
+		\IF{$|long\_peers| > table\_size^2$}
+			\STATE $long\_peers \leftarrow$ random subset of $long\_peers$ of size $table\_size^2$
+		\ENDIF
+	\end{algorithmic}
+\end{algorithm} 
+%TODO We should change how to handle long peers, make it a generalizable function
+%TODO Can we generalize further?
 
 \section{UrDHT}
 \label{sec:urdht}
@@ -136,12 +189,14 @@ We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH).
 	
 	UrDHT is sectioned off into 3 components: database, network, and logic.
 	Database handles file storage and network dictates the protocol for how nodes communicate.
-
+	
+	The distance and midpoints functions are defined and discussed in detail in Section \ref{sec:hyper}
 	
 	\subsubsection{Put and Poll}
 	\subsection{Hyperbolic Routing}
 	\label{sec:hyper}
 	
+	\subsection{Okay, this is interesting, but why bother?}
 	\subsection{Implementing Chord and Ring Based Topology}
 	
 	
