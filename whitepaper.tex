@@ -52,7 +52,7 @@ UrDHT is our specification and implementation of an abstract DHT.
 %TODO DO THIS FIRST
 \begin{itemize}
 	\item We first discuss our motivation for creating UrDHT and \textit{creating it the way we did}  (Section \ref{sec:motivation}).
-	\item We give a formal specification for what needs to be defined for a DHT.
+	\item We give a formal specification for what needs to be defined in order to create a functioning DHT.
 	While there has long existed a well known protocol for distributed hash tables, these define what a DHT needs to be able to do.
 	It does not describe what a DHT is.
 	We define a set of simple functions that are needed to implement a DHT.
@@ -81,12 +81,14 @@ How do we want our program to communicate over the network?
 
 UrDHT exists to simplify this process, minimizing the distributed application development time and making it easier to adopt by creating a network to bootstrap \textit{other networks}.
 
-\subsection{Embedding}
-
 
 \subsection{Abstraction}
 
 We've see that CHord doesn't work
+
+
+\subsection{Embedding}
+
 
 \section{What Defines a DHT}
 \label{sec:define}
@@ -111,7 +113,7 @@ The following functions need to be defined in order for nodes to perform lookup 
 	In most DHTs, the distance in the overlay has no correlation with real-world attributes.
 	This is not necessarily the case with UrDHT (see Section \ref{sec:hyper}).
 	
-	\item \textbf{A \texttt{midpoint} function} - The .
+	\item \textbf{A \texttt{midpoint} function} - This calculates the minimally equidistant point between two given point.
 	The midpoint is required for Delaunay triangulation calculation.
 	In some spaces, such as Kademlia's XOR metric space, this can be tricky to calculate.  % Is this part of ownership?
 	\item \textbf{An \texttt{responsibility} definition}  This defines the range of keys a node is responsible for. 
@@ -144,7 +146,7 @@ LEAD INTO MULTIHASH GOES HERE
 With the following components of a DHT defined above we can now show the relationship between DHTs and the primal-dual problems of Delaunay Triangulation and Voronoi Tessellation.
 
 
-We can map a nodes ID to a point in a space, the range of keys a node is responsible for to that nodes Voronoi region, and the set of short peers to the Delaunay triangulation.
+We can map a given node's ID to a point in a space, the range of keys a node is responsible for to that node's Voronoi region, and the set of short peers to the Delaunay triangulation.
 Thus, if we can calculate the Delaunay triangulation between nodes in a DHT, we have a generalized means of created the overlay network.
 
 
@@ -178,9 +180,10 @@ We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH) \ci
 			\STATE Add $c$ to $short\_peers$
 		\ENDWHILE
 		\STATE Add $candidates$ to the set of $long\_peers$	
-		\IF{$|long\_peers| > table\_size^2$}
-			\STATE $long\_peers \leftarrow$ random subset of $long\_peers$ of size $table\_size^2$
-		\ENDIF
+		\STATE \texttt{handleLongPeers}($long\_peers$)
+		%\IF{$|long\_peers| > table\_size^2$}
+		%	\STATE $long\_peers \leftarrow$ random subset of $long\_peers$ of size $table\_size^2$
+		%\ENDIF
 	\end{algorithmic}
 \end{algorithm} 
 %TODO We should change how to handle long peers, make it a generalizable function
