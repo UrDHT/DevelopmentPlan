@@ -129,8 +129,22 @@ Long peers allow the DHT to achieve a better than linear lookup time, typically 
 
 Interestingly, despite the diversity of DHT topologies, all DHTs use the relatively the greedy routing algorithm (Algorithm X):
 
-ALGORITHM BLOCK GOES HERE OR SOMETHING
-
+\begin{algorithm}
+	\caption{The DHT routing algorithm}
+	\label{alg:routing}
+	\algsetup{linenosize=\tiny}
+	\begin{algorithmic}[1]
+		\STATE Given node $n$ and a message being sent to $key$
+		\IF{If $key \in n$'s range of responsibility}
+			\RETURN $ n $
+		\ENDIF
+		\IF{ One of $n$'s short peers are responsible}
+			\RETURN the responsible node
+		\ENDIF
+	\end{algorithmic}
+	
+	\scriptsize
+\end{algorithm}
 If I, the node, am responsible for the key, I return myself.
 Otherwise, if I know who is responsible for this key, I return that node.
 Finally, if that is not the case, I forward this query to the node I know with shortest distance from the node to the desired key.\footnote{This order matters, as Chord is unidirectional.} 
@@ -203,6 +217,14 @@ We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH) \ci
 	\label{sec:hyper}
 	
 	\subsection{Okay, this is interesting, but why bother?}
+	
+	Hyperbolic spaces allow us to cleanly embed scale free graphs
+	
+	\subsection{Wait, Nodes can move in DHTs??}
+	Yes, they can.  
+	There's no rule against it. 
+	In fact, it helps.
+	
 	\subsection{Implementing Chord and Ring Based Topology}
 	
 	
