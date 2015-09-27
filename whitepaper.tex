@@ -40,13 +40,46 @@
 
 \section{Introduction}
 
-Distributed Hash Tables have been extensively researched for the past decade.
+Distributed Hash Tables (DHT) have been extensively researched for the past decade.
+Many different DHT protocols have developed over the years.
 %What is a DHT
 % Mention the DHT API
 Despite this, no one has created a cohesive formal specification for building a DHT. % or something
 
 
 UrDHT is our specification and implementation of an abstract DHT.
+
+
+\subsection*{Motivation}
+\label{sec:motivation}
+
+\subsubsection{Abstraction}
+
+Distributed Hash Tables have been the catalyst for the creation of many P2P applications.
+Among these are example 1, example 2, another citation, citation, and, most notably, BitTorrent \cite{bittorrent}.  %TODO Add actual citations
+All use roughly the same protocol to perform lookup, storage and retrieval operations.
+Despite this, no one has created a cohesive formal specification for building a DHT.
+
+Our initial primary motivation for this project was to create an abstracted Distributed Hash Table based on observations we made during previous research \cite{dgvh}
+
+\subsubsection{Bootstrapping}
+One issue in the adoption of new P2P applications is the bootstrapping problem.
+A node can only join the network if it knows another node \textit{that is already a member of the network it is trying to join.}
+
+
+The other motivation is making it easier for users to create distributed applications.
+What topology do you use?
+How do we want our program to communicate over the network?
+
+
+UrDHT exists to simplify this process, minimizing the distributed application development time and making it easier to adopt by creating a network to bootstrap \textit{other networks}.
+
+
+\subsubsection{Embedding}
+
+
+
+
 
 
 %TODO DO THIS FIRST
@@ -61,33 +94,6 @@ UrDHT is our specification and implementation of an abstract DHT.
 	We show how to reproduce the topology of Chord and Kademlia using UrDHT, which we call UrChord and UrKademlia.
 	\item We conduct experiments showing that UrChord sufficiently approximates a correct implementation of Chord.
 \end{itemize}
-
-\section{Motivation}
-\label{sec:motivation}
-
-Distributed Hash Tables have been the catalyst for the creation of many P2P applications.
-Among these are example 1, example 2, another citation, citation, and, most notably, BitTorrent \cite{bittorrent}.  %TODO Add actual citations
-
-
-\subsection{Bootstrapping}
-One issue in the adoption of new P2P applications is the bootstrapping problem.
-A node can only join the network if it knows another node \textit{that is already a member of the network it is trying to join.}
-
-
-The other motivation is making it easier for users to create distributed applications.
-What topology do you use?
-How do we want our program to communicate over the network?
-
-
-UrDHT exists to simplify this process, minimizing the distributed application development time and making it easier to adopt by creating a network to bootstrap \textit{other networks}.
-
-
-\subsection{Abstraction}
-
-We've see that CHord doesn't work
-
-
-\subsection{Embedding}
 
 
 \section{What Defines a DHT}
@@ -130,17 +136,21 @@ Long peers allow the DHT to achieve a better than linear lookup time, typically 
 Interestingly, despite the diversity of DHT topologies, all DHTs use the relatively the greedy routing algorithm (Algorithm X):
 
 \begin{algorithm}
-	\caption{The DHT routing algorithm}
+	\caption{The DHT Generic Routing algorithm}
 	\label{alg:routing}
 	\algsetup{linenosize=\tiny}
 	\begin{algorithmic}[1]
 		\STATE Given node $n$ and a message being sent to $key$
+		\STATE \textbf{function} $n.$\texttt{lookup}$(key)$
 		\IF{If $key \in n$'s range of responsibility}
 			\RETURN $ n $
 		\ENDIF
-		\IF{ One of $n$'s short peers are responsible}
+		\IF{ One of $n$'s short peers are responsible for $key$}
 			\RETURN the responsible node
 		\ENDIF
+		\STATE $ candidates $ = $ short\_peers $ + $ long\_peers $
+		\STATE $ next  \leftarrow $  $\min (n$.distance($candidates$, $ key ))$
+		\RETURN $next.$lookup($key$)
 	\end{algorithmic}
 	
 	\scriptsize
@@ -149,12 +159,14 @@ If I, the node, am responsible for the key, I return myself.
 Otherwise, if I know who is responsible for this key, I return that node.
 Finally, if that is not the case, I forward this query to the node I know with shortest distance from the node to the desired key.\footnote{This order matters, as Chord is unidirectional.} 
 
-Between individual DHTs, this algorithm might be implemented either recursively or iteratively, the handling of dead nodes encountered during lookup might be difference, and possibly in parallel such as in case of Kademlia.
+Between individual DHTs, this algorithm might be implemented either recursively or iteratively.
+It will certainly have differences in how a node handles errors, such as how to handle connecting to a failed node which no longer exists.
+This algorithm may possibly be  run in parallel, such as in Kademlia \cite{kademlia}.
 Despite this, the base greedy algorithm is always the same between implementations.
 
 The final component is a consistent hashing function.
 This function must generate keys large enough to make the chances of a hash collision nigh impossible.
-LEAD INTO MULTIHASH GOES HERE
+%LEAD INTO MULTIHASH GOES HERE
 
 \subsection{DHTs, Delaunay Triangulation, and Voronoi Tesselation}
 With the following components of a DHT defined above we can now show the relationship between DHTs and the primal-dual problems of Delaunay Triangulation and Voronoi Tessellation.
@@ -172,7 +184,7 @@ We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH) \ci
 	\caption{Distributed Greedy Voronoi Heuristic}
 	\label{alg:dgvh}
 	\algsetup{linenosize=\tiny}
-	\scriptsize
+	%\scriptsize
 	\begin{algorithmic}[1]  % the numberis how many lines
 		\STATE Given node $n$ and its list of $candidates$.
 		\STATE Given the minimum $table\_size$
@@ -202,6 +214,19 @@ We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH) \ci
 \end{algorithm} 
 %TODO We should change how to handle long peers, make it a generalizable function
 %TODO Can we generalize further?
+
+%TODO IS THIS HOW WE IMPLEMENT IT IN URDHT? DO WE CHOOSE just one peer in gossip?
+%TODO short or all peers
+DGVH uses the midpoint to gauge which other nodes to use as its Delaunay triangulation \cite{dgvh}.
+Every maintenance cycle, nodes exchange their peer lists with a current neighbor and then recalculate their neighbors.  
+A node creates a list of candidates by combining their peer list with  their neighbor's peer list.
+This list of peers is then sorted from closest to furthest distance.
+The node then initializes a new peer list with the closest candidate.
+For each of the remaining candidates, the node calculates the midpoint between itself and the candidate.
+If new peer list does not contain any nodes closer to the midpoint than the candidate, the candidate is added to the new peer list.
+Otherwise, the candidate is set aside.
+
+
 
 \section{UrDHT}
 \label{sec:urdht}
