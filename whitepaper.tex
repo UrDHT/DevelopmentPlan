@@ -177,7 +177,7 @@ Thus, if we can calculate the Delaunay triangulation between nodes in a DHT, we 
 
 
 So how do we efficiently calculate Delaunay Triangulations in a distributed system?
-We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH) \cite{dgvh}, shown in Algorithm \ref{alg:dgvh}.
+We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH), shown in Algorithm \ref{alg:dgvh} and explained below \cite{dgvh}.
 
 
 \begin{algorithm} % make smaller
@@ -218,7 +218,7 @@ We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH) \ci
 %TODO IS THIS HOW WE IMPLEMENT IT IN URDHT? DO WE CHOOSE just one peer in gossip?
 %TODO short or all peers
 DGVH uses the midpoint to gauge which other nodes to use as its Delaunay triangulation \cite{dgvh}.
-Every maintenance cycle, nodes exchange their peer lists with a current neighbor and then recalculate their neighbors.  
+Every maintenance cycle, nodes exchange their peer lists with\textbf{ a current neighbor and then recalculate their neighbors.  }
 A node creates a list of candidates by combining their peer list with  their neighbor's peer list.
 This list of peers is then sorted from closest to furthest distance.
 The node then initializes a new peer list with the closest candidate.
@@ -250,7 +250,9 @@ Otherwise, the candidate is set aside.
 	There's no rule against it. 
 	In fact, it helps.
 	
-	\subsection{Implementing Chord and Ring Based Topology}
+	\subsection{Implementing Chord and Ring-Based Topology}
+	
+	Ring topologies are fairly straightforward since they act as are one dimensional
 	
 	
 	\subsection{Implementing Kademlia and Other Tree Based Topologies}
