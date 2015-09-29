@@ -31,7 +31,7 @@
 \maketitle
 %TODO Actual number of functions
 \begin{abstract}
-	UrDHT is an abstracted Distributed Hash Table (DHT).
+	UrDHT is an abstracted Distributed Hash Table (DHT) which maps the topologies of DHTs to the primal-dual problem of Voronoi Tessellation and Delaunay Triangulation.
 	By completing a few simple functions, a developer can implement the topology of any DHT.
 	
 	Current distributed systems suffer from fragmentation, high overhead, and an inability to scale due to difficulty of adoption.
@@ -61,7 +61,7 @@ All DHTs use roughly the same protocol to perform lookup, storage, and retrieval
 Despite this, no one has created a cohesive formal specification for building a DHT.
 
 Our initial primary motivation for this project was to create an abstracted Distributed Hash Table based on observations we made during previous research \cite{dgvh}.
-We discovered that all DHTs can cleanly map to the primal-dual 
+We discovered that all DHTs can cleanly map to the primal-dual problems of Voronoi Tessellation and 
 
 \subsubsection{Bootstrapping}
 One issue in the adoption of new P2P applications is the bootstrapping problem.
@@ -79,8 +79,17 @@ UrDHT exists to simplify this process, minimizing the distributed application de
 \subsubsection{Embedding}
 
 
+One of the other features shared by nearly every DHT is that routing works by minimizing the number of hops across the overlay network, with all hops treated as the same length.
+This is done because it is assumed that DHTs know nothing about the state of actual infrastructure the overlay is built upon.
 
+However, this means that most DHTs will happily route a message from one continent to another and back.
+This is obviously undesirable, but is treated as the status quo in DHTs.
+Part of this is because nodes are typically assigned a point in the keyspace corresponding to the hash of some identifier or given a point randomly.
+This is done for purposes of load balancing and fault tolerance.
 
+This motivated us to create a means of latency into the DHT
+, while still maintaining the system's fault tolerance.
+Doing so would allow mean that the hops traversed to a destination are, in fact, the shortest path to the destination.
 
 
 %TODO DO THIS FIRST
