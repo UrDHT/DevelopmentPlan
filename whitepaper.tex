@@ -5,6 +5,7 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{hyperref}
 
 
 \usepackage{subcaption}
@@ -56,12 +57,12 @@ UrDHT is our specification and implementation of an abstract DHT.
 \subsubsection{Abstraction}
 
 Distributed Hash Tables have been the catalyst for the creation of many P2P applications.
-Among these are Redis, Freenet \cite{freenet}, and, most notably, BitTorrent \cite{bittorrent}.  %TODO Add actual citations
+Among these are Redis \cite{redis}, Freenet \cite{freenet}, and, most notably, BitTorrent \cite{bittorrent}.  %TODO Add actual citations
 All DHTs use roughly the same protocol to perform lookup, storage, and retrieval operations.
 Despite this, no one has created a cohesive formal specification for building a DHT.
 
 Our initial primary motivation for this project was to create an abstracted Distributed Hash Table based on observations we made during previous research \cite{dgvh}.
-We discovered that all DHTs can cleanly map to the primal-dual problems of Voronoi Tessellation and 
+We discovered that all DHTs can cleanly map to the primal-dual problems of Voronoi Tessellation and Delaunay Triangulation.
 
 \subsubsection{Bootstrapping}
 One issue in the adoption of new P2P applications is the bootstrapping problem.
