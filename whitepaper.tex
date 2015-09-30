@@ -88,9 +88,9 @@ This is obviously undesirable, but is treated as the status quo in DHTs.
 Part of this is because nodes are typically assigned a point in the keyspace corresponding to the hash of some identifier or given a point randomly.
 This is done for purposes of load balancing and fault tolerance.
 
-This motivated us to create a means of latency into the DHT
-, while still maintaining the system's fault tolerance.
-Doing so would allow mean that the hops traversed to a destination are, in fact, the shortest path to the destination.
+This motivated us to create a means of embedding latency into the DHT,
+while still maintaining the system's fault tolerance.
+Doing so would mean that the hops traversed to a destination are, in fact, the shortest path to the destination.
 
 
 %TODO DO THIS FIRST
@@ -114,7 +114,7 @@ A distributed hash table is usually defined by its protocol; in other words, wha
 Nodes and data in a distributed hash table are assigned unique\footnote{Unique with astronomically high probability, given a large enough consistent hash algorithm.} keys via a consistent hashing algorithm.
 To make it easier to grok the context, we will call the key associated with a node its ID and refer to  nodes and their IDs interchangeably.
 
-A DHT can perform the \texttt{lookup(key)}, \texttt{get(key)}, and \texttt{store(key, value)} operations. \footnote{There is typically a \textit{delete(key)} operation defined too, but it is not strictly necessary.}.
+A DHT can perform the \texttt{lookup(key)}, \texttt{get(key)}, and \texttt{store(key, value)} operations.\footnote{There is typically a \textit{delete(key)} operation defined too, but it is not strictly necessary.}
 The \texttt{lookup }operation returns the node responsible for a queried key, \texttt{get} returns the value stored with that key with the \texttt{store} function.
 
 However, this is what a DHT \textit{does}, viewing the DHT as a black box, not what a DHT \textit{is} and needs to be implemented.
@@ -144,7 +144,7 @@ Short peers are the set of peers that define the topology of the network and gua
 
 Long peers allow the DHT to achieve a better than linear lookup time, typically $ \log(n) $, where $n$ is the size of the network. 
 
-Interestingly, despite the diversity of DHT topologies, all DHTs use the relatively the greedy routing algorithm (Algorithm X):
+Interestingly, despite the diversity of DHT topologies, all DHTs use the relatively the greedy routing algorithm (Algorithm \ref{alg:routing}):
 
 \begin{algorithm}
 	\caption{The DHT Generic Routing algorithm}
