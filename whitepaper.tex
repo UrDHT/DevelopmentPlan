@@ -62,7 +62,10 @@ All DHTs use roughly the same protocol to perform lookup, storage, and retrieval
 Despite this, no one has created a cohesive formal specification for building a DHT.
 
 Our initial primary motivation for this project was to create an abstracted Distributed Hash Table based on observations we made during previous research \cite{dgvh}.
-We discovered that all DHTs can cleanly map to the primal-dual problems of Voronoi Tessellation and Delaunay Triangulation.
+We discovered that all DHTs can cleanly be mapped to the primal-dual problems of Voronoi Tessellation and Delaunay Triangulation.
+
+UrDHT directly builds its topology using this insight.
+ 
 
 \subsubsection{Bootstrapping}
 One issue in the adoption of new P2P applications is the bootstrapping problem.
@@ -95,7 +98,7 @@ Doing so would mean that the hops traversed to a destination are, in fact, the s
 
 %TODO DO THIS FIRST
 \begin{itemize}
-	\item We first discuss our motivation for creating UrDHT and \textit{creating it the way we did}  (Section \ref{sec:motivation}).
+	%\item We first discuss our motivation for creating UrDHT and \textit{creating it the way we did}  (Section \ref{sec:motivation}).
 	\item We give a formal specification for what needs to be defined in order to create a functioning DHT.
 	While there has long existed a well known protocol for distributed hash tables, these define what a DHT needs to be able to do.
 	It does not describe what a DHT is.
@@ -168,7 +171,7 @@ Interestingly, despite the diversity of DHT topologies, all DHTs use the relativ
 \end{algorithm}
 If I, the node, am responsible for the key, I return myself.
 Otherwise, if I know who is responsible for this key, I return that node.
-Finally, if that is not the case, I forward this query to the node I know with shortest distance from the node to the desired key.\footnote{This order matters, as Chord is unidirectional.} 
+Finally, if that is not the case, I forward this query to the node I know with shortest distance from the node to the desired key.\footnote{This order matters, as some DHTs such as Chord are unidirectional.} 
 
 Between individual DHTs, this algorithm might be implemented either recursively or iteratively.
 It will certainly have differences in how a node handles errors, such as how to handle connecting to a failed node which no longer exists.
@@ -243,8 +246,9 @@ Otherwise, the candidate is set aside.
 \label{sec:urdht}
 	\subsection{UrDHT Components (or maybe logic)}
 	
-	UrDHT is sectioned off into 3 components: database, network, and logic.
+	UrDHT is sectioned off into 3 pieces: database, network, and logic.
 	Database handles file storage and network dictates the protocol for how nodes communicate.
+	
 	
 	The distance and midpoints functions are defined and discussed in detail in Section \ref{sec:hyper}
 	
