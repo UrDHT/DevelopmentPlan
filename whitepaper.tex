@@ -192,8 +192,11 @@ With the following components of a DHT defined above we can now show the relatio
 We can map a given node's ID to a point in a space, the range of keys a node is responsible for to that node's Voronoi region, and the set of short peers to the Delaunay triangulation.
 Thus, if we can calculate the Delaunay triangulation between nodes in a DHT, we have a generalized means of created the overlay network.
 
+This can be done with any algorithm that calculates the Delaunay Triangulation.
+However there is a plethora of DHTs with highly diverse spaces. 
+The majority of well-known algorithms for solving this problem, such as Fortune's Sweepline \cite{fortune}, are designed to be run centralized.
 
-So how do we efficiently calculate Delaunay Triangulations in a distributed system?
+Is there an algorithm we can use to efficiently calculate Delaunay Triangulations for a distributed system in an arbitrary space?
 We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH), shown in Algorithm \ref{alg:dgvh} and explained below \cite{dgvh}.
 
 
