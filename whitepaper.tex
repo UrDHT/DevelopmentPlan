@@ -32,12 +32,11 @@
 \maketitle
 %TODO Actual number of functions
 \begin{abstract}
-	UrDHT is an abstracted Distributed Hash Table (DHT) which maps the topologies of DHTs to the primal-dual problem of Voronoi Tessellation and Delaunay Triangulation.
+	UrDHT is an abstracted Distributed Hash Table (DHT) that maps the topologies of DHTs to the primal-dual problem of Voronoi Tessellation and Delaunay Triangulation.
+	Many of the DHTs have an inherent set of the same qualities, such as greedy routing, maintaining lists of peers which define the topology, and forming an overlay network. 
 	By completing a few simple functions, a developer can implement the topology of any DHT.
 	
-	Current distributed systems suffer from fragmentation, high overhead, and an inability to scale due to difficulty of adoption.
-	UrDHT is P2P system designed to improve the adaptability of P2P distributed serves.
-\end{abstract}
+	\end{abstract}
 
 \section{Introduction}
 
@@ -78,6 +77,10 @@ How do we want our program to communicate over the network?
 
 
 UrDHT exists to simplify this process, minimizing the distributed application development time and making it easier to adopt by creating a network to bootstrap \textit{other networks}.
+
+Current distributed systems suffer from fragmentation, high overhead, and an inability to scale due to difficulty of adoption.
+UrDHT is P2P system designed to improve the adaptability of P2P distributed serves.
+
 
 
 \subsubsection{Embedding}
@@ -278,7 +281,28 @@ Otherwise, the candidate is set aside.
 \section{Experiments}
 \label{sec:experiments}
 
+We are doing simulations. 
+This is standard practice in both whitepapers and applications
+Citations are all major DHTs
+Citations for analysis works that use simulations
+Citations for applications of DHTs that were peer reviewed and accepted uing simulations
+
+
+
+\subsection{UrDHT Cohesion Euclidean Space}
+
 %TODO show DGVH is the bomb in 1D cause 1D is easy
+
+\subsection{Cohesion in hyperbolic space}
+We showed in worked in DGVH, it should work in a hyperbolic space.
+
+
+\subsection{Performance of Chord on our network module vs UrChord}
+
+
+\subsection{UrKademlia Works}
+
+
 \section{Future Work and Conclusions}
 \label{sec:future}
 
