@@ -123,6 +123,7 @@ The end result was a DHT with latency embedded into the overlay.
 Nodes can respond to changes in latency and the network by effectively moving their positions.
 %We use  a force spring model to accomplish this.
 
+\subsubsection*{Accomplishments}
 To summarize our accomplishments:
 
 %TODO DO THIS FIRST
@@ -133,16 +134,16 @@ To summarize our accomplishments:
 	It does not describe what a DHT is.
 	
 	We show that DHTs cleanly map to the primal-dual problem of Delaunay triangulations and Voronoi tessellations.
-	We list a set  of simple functions that, once defined, allow our Distributed Greedy Voronoi Heuristic to be run in any space, creating a DHT overlay for that space (Section \ref{sec:define}).
+	We list a set  of simple functions that, once defined, allow our Distributed Greedy Voronoi Heuristic (DGVH) to be run in any space, creating a DHT overlay for that space (Section \ref{sec:define}).
 	
 	
 	
-	\item We present UrDHT as an abstract DHT and show how a developer can tweak the functions we defined to create an arbitrary new DHT topology.
+	\item We present UrDHT as an abstract DHT and show how a developer can tweak the functions we defined to create an arbitrary new DHT topology (Section \ref{sec:urdht}).
+	\item We show how to reproduce the topology of Chord and Kademlia using UrDHT, which we call UrChord and UrKademlia (Section \ref{sec:implement}).
+	\item We show how we can embed latency into the overlay of a DHT by placing the DHT into and defining the necessary methods so that DGVH can run in that space  (Section \ref{sec:hyper}).
 	
-	
-	We show how to reproduce the topology of Chord and Kademlia using UrDHT, which we call UrChord and UrKademlia (Section \ref{sec:urdht}).
-	
-	\item We conduct experiments showing that UrChord sufficiently approximates a correct implementation of Chord.
+	\item We conduct experiments showing that UrChord sufficiently approximates a correct implementation of Chord (Section \ref{sec:experiments}). 
+	\item We discuss the ramifications of our work and what future work is available.
 \end{itemize}
 
 
@@ -283,17 +284,63 @@ Otherwise, the candidate is set aside.
 
 \section{UrDHT}
 \label{sec:urdht}
-	\subsection{UrDHT Components (or maybe logic)}
 	
-	UrDHT is sectioned off into 3 pieces: database, network, and logic.
+	
+	UrDHT is sectioned off into 3 broad components: database, network, and logic.
 	Database handles file storage and network dictates the protocol for how nodes communicate.
+	These components deal with the lower level mechanics of how files are stored on the network and how bits are transmitted through the network.
+	The specifics are outside the scope of the paper, but can be found on the UrDHT Project \cite{urdht}.
+	
+	The Logic component is what dictates the behavior of the DHT and the construction of the overlay network.
+	It is composed of two parts: the DHT protocol and the space math.
+	
+	The DHT protocol is the canonical operations that a DHT performs, while the space math is what effectively distinguishes one DHT from another.
+	We discuss each in further detail below.
 	
 	
-	The distance and midpoints functions are defined and discussed in detail in Section \ref{sec:hyper}
+	\subsection{The DHT Protocol }
+	%TODO in case of conflict with reality, move components from one section to another
+	The DHT protocol is the shared functionality between every single DHT.
+	It consists of the node's information, the short peer list to define the overlay, the long peers that make efficient routing possible, and a bunch of other stuff.
 	
-	\subsubsection{Put and Poll}
-	\subsection{Hyperbolic Routing}
+	
+	
+	\subsection{The Space Math}
+	The space math consists of the functions which define the DHTs topology.
+	
+	The distance and midpoints functions are defined and discussed in detail in Section \ref{sec:hyper}	
+	
+	\subsubsection*{Put and Poll}
+	The functions of \texttt{store} and \texttt{get} can be further abstracted otu to \texttt{put} and \texttt{poll}
+	
+	
+	This does X
+
+
+\section{Implementing other DHTs}
+\label{sec:implement}
+	\subsection{Implementing Chord and Ring-Based Topology}
+	
+	Ring topologies are fairly straightforward since they act as are one dimensional Voronoi Tesselations, splitting up what is effectively a modular number line among multiple nodes.
+	
+	
+	\subsection{Implementing Kademlia and Other Tree Based Topologies}
+	Trees are easy to embed in a hyperbolic space.
+	
+	The largest complication in implementing UrKademlia is defining the exclusive or, or XOR, metric which is used for distance.
+	This metric, while non-euclidean, is perfectly acceptable for calculating distance in Kademlia \cite{kademlia}
+	However, XOR does not have an intuitive midpoint we could use for DGVH.
+	
+	We found that
+	
+	\subsection{ZHT}
+	ZHT \cite{li2013zht} leads to an extremely trivial implementation in UrDHT.
+	
+\section{DHTs in a Hyperbolic Topology}
+	
 	\label{sec:hyper}
+	
+
 	
 	\subsection{Okay, this is interesting, but why bother?}
 	
@@ -304,15 +351,8 @@ Otherwise, the candidate is set aside.
 	There's no rule against it. 
 	In fact, it helps.
 	
-	\subsection{Implementing Chord and Ring-Based Topology}
-	
-	Ring topologies are fairly straightforward since they act as are one dimensional
 	
 	
-	\subsection{Implementing Kademlia and Other Tree Based Topologies}
-	Trees are easy to embed in a hyperbolic space.
-	\subsection{ZHT}
-	ZHT leads to an extremely trivial implementation in UrDHT.
 	
 \section{Experiments}
 \label{sec:experiments}
