@@ -40,40 +40,49 @@
 
 \section{Introduction}
 
-Distributed Hash Tables (DHT) have been extensively researched for the past decade.
-Many different DHT protocols have developed over the years.
+%Distributed Hash Tables (DHT) have been extensively researched for the past decade.
+%Many different DHT protocols have developed over the years.
 %What is a DHT
 % Mention the DHT API
-Despite this, no one has created a cohesive formal specification for building a DHT. % or something
+%Despite this, no one has created a cohesive formal specification for building a DHT. % or something
 
 
-UrDHT is our specification and implementation of an abstract DHT.
+%UrDHT is our specification and implementation of an abstract DHT.
 
 
-\subsection*{Motivation}
-\label{sec:motivation}
+%\subsection*{Motivation}
+
 
 \subsubsection{Abstraction}
 
 Distributed Hash Tables have been the catalyst for the creation of many P2P applications.
-Among these are Redis \cite{redis}, Freenet \cite{freenet}, and, most notably, BitTorrent \cite{bittorrent}.  %TODO Add actual citations
+Among these are Redis \cite{redis}, Freenet \cite{freenet}, and, most notably, BitTorrent \cite{bittorrent}. 
 All DHTs use roughly the same protocol to perform lookup, storage, and retrieval operations.
 Despite this, no one has created a cohesive formal specification for building a DHT.
 
-Our initial primary motivation for this project was to create an abstracted Distributed Hash Table based on observations we made during previous research \cite{dgvh}.
-We discovered that all DHTs can cleanly be mapped to the primal-dual problems of Voronoi Tessellation and Delaunay Triangulation.
+Our primary motivation for this project was to create an abstracted Distributed Hash Table based on observations we made during previous research \cite{dgvh}.
+In that paper, we discovered that all DHTs can cleanly be mapped to the primal-dual problems of Voronoi Tessellation and Delaunay Triangulation.
 
-UrDHT directly builds its topology using this insight.
- 
+UrDHT directly builds its topology using this insight, using a greedy distributed heuristic for approximating Deluanay triangulations.
+It is our specification of an abstract DHT, which can be used to build of DHTs.
+We found that we could reproduce the topology of different DHTs by defining the necessary distance and midpoint functions for the space.  %TODO and what else
+
 
 \subsubsection{Bootstrapping}
-One issue in the adoption of new P2P applications is the bootstrapping problem.
-A node can only join the network if it knows another node \textit{that is already a member of the network it is trying to join.}
+Another ambiguous issue with DHTs and DHT-based P2P applications we encountered is what we have termed the \textit{bootstrapping problem}.
+A node can only join the network if it knows another node that is already a member of the network it is trying to join.
 
 
-The other motivation is making it easier for users to create distributed applications.
-What topology do you use?
-How do we want our program to communicate over the network?
+%How does CAN address this or Kademlia or Chord
+
+The general way this works is by having a potential user manually look up the bootstrapping information needed at a centralized source, such as the project or application's website.
+There is a philosophical conflict here:  a distributed application using a centralized source of information to build a distributed network.
+
+
+
+%The other motivation is making it easier for users to create distributed applications.
+%What topology do you use?
+%How do we want our program to communicate over the network?
 
 
 UrDHT exists to simplify this process, minimizing the distributed application development time and making it easier to adopt by creating a network to bootstrap \textit{other networks}.
@@ -90,14 +99,21 @@ One of the other features shared by nearly every DHT is that routing works by mi
 This is done because it is assumed that DHTs know nothing about the state of actual infrastructure the overlay is built upon.
 
 However, this means that most DHTs will happily route a message from one continent to another and back.
-This is obviously undesirable, but is treated as the status quo in DHTs.
-Part of this is because nodes are typically assigned a point in the keyspace corresponding to the hash of some identifier or given a point randomly.
+This is obviously undesirable, but is the status quo in DHTs.
+This stems from the generation of node IDs in DHTs. 
+Nodes are typically assigned a point in the range of a cryptographic hash funtion, called the keyspace. 
+This ID corresponds to the hash of some identifier or given a point randomly.
 This is done for purposes of load balancing and fault tolerance.
 
-This motivated us to create a means of embedding latency into the DHT,
-while still maintaining the system's fault tolerance.
+We asked ourselves if there was a means of embedding latency into the DHT, while still maintaining the system's fault tolerance.
 Doing so would mean that the hops traversed to a destination are, in fact, the shortest path to the destination.
 
+We found that we could embed a latency graph in a hyperbolic space and defined UrDHT such that it operates within this space.
+The end result was a DHT with latency embedded into the overlay.
+Nodes can respond to changes in latency and the network by effectively moving their positions.
+We use  a force spring model to accomplish this.
+
+To summarize our accomplishments:
 
 %TODO DO THIS FIRST
 \begin{itemize}
@@ -105,10 +121,17 @@ Doing so would mean that the hops traversed to a destination are, in fact, the s
 	\item We give a formal specification for what needs to be defined in order to create a functioning DHT.
 	While there has long existed a well known protocol for distributed hash tables, these define what a DHT needs to be able to do.
 	It does not describe what a DHT is.
-	We define a set of simple functions that are needed to implement a DHT.
-	We show that using these functions, DHTs cleanly map to the primal-dual problem of Delaunay triangulations and Voronoi tessellations (Section \ref{sec:define}).
+	
+	We show that DHTs cleanly map to the primal-dual problem of Delaunay triangulations and Voronoi tessellations.
+	We list a set  of simple functions that, once defined, allow our Distributed Greedy Voronoi Heuristic to be run in any space, creating a DHT overlay for that space (Section \ref{sec:define}).
+	
+	
+	
 	\item We present UrDHT as an abstract DHT and show how a developer can tweak the functions we defined to create an arbitrary new DHT topology.
-	We show how to reproduce the topology of Chord and Kademlia using UrDHT, which we call UrChord and UrKademlia.
+	
+	
+	We show how to reproduce the topology of Chord and Kademlia using UrDHT, which we call UrChord and UrKademlia (Section \ref{sec:urdht}).
+	
 	\item We conduct experiments showing that UrChord sufficiently approximates a correct implementation of Chord.
 \end{itemize}
 
@@ -194,7 +217,7 @@ Thus, if we can calculate the Delaunay triangulation between nodes in a DHT, we 
 
 This can be done with any algorithm that calculates the Delaunay Triangulation.
 However there is a plethora of DHTs with highly diverse spaces. 
-The majority of well-known algorithms for solving this problem, such as Fortune's Sweepline \cite{fortune}, are designed to be run centralized.
+The majority of well-known algorithms for solving this problem, such as Fortune's Sweepline \cite{fortune1987sweepline}, are designed to be run centralized.
 
 Is there an algorithm we can use to efficiently calculate Delaunay Triangulations for a distributed system in an arbitrary space?
 We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH), shown in Algorithm \ref{alg:dgvh} and explained below \cite{dgvh}.
@@ -309,7 +332,7 @@ We showed in worked in DGVH, it should work in a hyperbolic space.
 \section{Future Work and Conclusions}
 \label{sec:future}
 
-\bibliography{mine,dht}
+\bibliography{mine,dht,voronoi}
 \bibliographystyle{plain}
 
 \end{document}
