@@ -32,14 +32,19 @@
 \maketitle
 %TODO Actual number of functions
 \begin{abstract}
-	UrDHT is an abstracted Distributed Hash Table (DHT) that maps the topologies of DHTs to the primal-dual problem of Voronoi Tessellation and Delaunay Triangulation.
-	Many of the DHTs have an inherent set of the same qualities, such as greedy routing, maintaining lists of peers which define the topology, and forming an overlay network. 
-	By completing a few simple functions, a developer can implement the topology of any DHT.
+UrDHT is an abstracted Distributed Hash Table (DHT) that maps the topologies of DHTs to the primal-dual problem of Voronoi Tessellation and Delaunay Triangulation.
+Many of the DHTs have an inherent set of the same qualities, such as greedy routing, maintaining lists of peers which define the topology, and forming an overlay network. 
+By completing a few simple functions, a developer can implement the topology of any DHT in any arbitrary space.
+
+%Latency embedding
+One topology of particular interest we created is a DHT operating within a Poincar\'{e} disk model.
+This DHT has latency embedded within the overlay and capable of responding to changes in latency.
+The consequence of this is that, unlike other DHTs, the routing algorithm always uses the shortest latency path to a given destination.
+
 	
-	\end{abstract}
+\end{abstract}
 
 \section{Introduction}
-
 %Distributed Hash Tables (DHT) have been extensively researched for the past decade.
 %Many different DHT protocols have developed over the years.
 %What is a DHT
@@ -50,9 +55,12 @@
 %UrDHT is our specification and implementation of an abstract DHT.
 
 
-%\subsection*{Motivation}
 
-
+UrDHT is an abstract implementation of a DHT which solves a number of problems.
+First, it is a unified and cohesive model for creating distributed hash tables and P2P applications based on DHTs.
+Second, it provides a single network for bootstrapping distributed applications.
+Third, we show that using the abstraction features of UrDHT, we can embed latency into the DHT's overlay.
+%
 \subsubsection{Abstraction}
 
 Distributed Hash Tables have been the catalyst for the creation of many P2P applications.
@@ -67,10 +75,12 @@ UrDHT directly builds its topology using this insight, using a greedy distribute
 It is our specification of an abstract DHT, which can be used to build of DHTs.
 We found that we could reproduce the topology of different DHTs by defining the necessary distance and midpoint functions for the space.  %TODO and what else
 
+The end result is not only do we have an abstracted DHT, we have a simple framework that developers can use to quickly create new distributed applications and frameworks.
+
 
 \subsubsection{Bootstrapping}
-Another ambiguous issue with DHTs and DHT-based P2P applications we encountered is what we have termed the \textit{bootstrapping problem}.
-A node can only join the network if it knows another node that is already a member of the network it is trying to join.
+Another ambiguous issue with DHTs and DHT-based P2P applications we wish to address with UrDHT is the what we have termed the \textit{bootstrapping problem}.
+Simply put, a node can only join the network if it knows another node that is already a member of the network it is trying to join.
 
 
 %How does CAN address this or Kademlia or Chord
