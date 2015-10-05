@@ -81,35 +81,35 @@ The end result is not only do we have an abstracted DHT, we have a simple framew
 \subsubsection{Bootstrapping}
 Another ambiguous issue with DHTs and DHT-based P2P applications we wish to address with UrDHT is the what we have termed the \textit{bootstrapping problem}.
 Simply put, a node can only join the network if it knows another node that is already a member of the network it is trying to join.
+%
+%Current distributed systems suffer from fragmentation, high overhead, and an inability to scale due to difficulty of adoption.
+
 
 
 %How does CAN address this or Kademlia or Chord
 
 The general way this works is by having a potential user manually look up the bootstrapping information needed at a centralized source, such as the project or application's website.
-There is a philosophical conflict here:  a distributed application using a centralized source of information to build a distributed network.
+There is a philosophical conflict here: a distributed application using a centralized source of information to build a distributed network.
 
+
+%UrDHT is P2P system designed to improve the adaptability of P2P distributed serves.
 
 
 %The other motivation is making it easier for users to create distributed applications.
 %What topology do you use?
 %How do we want our program to communicate over the network?
 
-
 UrDHT exists to simplify this process, minimizing the distributed application development time and making it easier to adopt by creating a network to bootstrap \textit{other networks}.
-
-Current distributed systems suffer from fragmentation, high overhead, and an inability to scale due to difficulty of adoption.
-UrDHT is P2P system designed to improve the adaptability of P2P distributed serves.
+UrDHT does this by making it easy to add other networks as a service.
 
 
 
 \subsubsection{Embedding}
-
-
 One of the other features shared by nearly every DHT is that routing works by minimizing the number of hops across the overlay network, with all hops treated as the same length.
 This is done because it is assumed that DHTs know nothing about the state of actual infrastructure the overlay is built upon.
 
 However, this means that most DHTs will happily route a message from one continent to another and back.
-This is obviously undesirable, but is the status quo in DHTs.
+This is obviously undesirable, but it is the status quo in DHTs.
 This stems from the generation of node IDs in DHTs. 
 Nodes are typically assigned a point in the range of a cryptographic hash funtion, called the keyspace. 
 This ID corresponds to the hash of some identifier or given a point randomly.
@@ -121,7 +121,7 @@ Doing so would mean that the hops traversed to a destination are, in fact, the s
 We found that we could embed a latency graph in a hyperbolic space and defined UrDHT such that it operates within this space.
 The end result was a DHT with latency embedded into the overlay.
 Nodes can respond to changes in latency and the network by effectively moving their positions.
-We use  a force spring model to accomplish this.
+%We use  a force spring model to accomplish this.
 
 To summarize our accomplishments:
 
