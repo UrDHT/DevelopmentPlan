@@ -159,7 +159,7 @@ Short peers are the set of peers that define the topology of the network and gua
 
 Long peers allow the DHT to achieve a better than linear lookup time, typically $ \log(n) $, where $n$ is the size of the network. 
 
-Interestingly, despite the diversity of DHT topologies, all DHTs use the relatively the greedy routing algorithm (Algorithm \ref{alg:routing}):
+Interestingly, despite the diversity of DHT topologies, all DHTs use functionally identical greedy routing algorithms (Algorithm \ref{alg:routing}):
 
 \begin{algorithm}
 	\caption{The DHT Generic Routing algorithm}
@@ -245,8 +245,10 @@ We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH), sh
 %TODO short or all peers
 
 
-A node a set of peers, and uses DGVH to determine 
-These peers are generally 
+From the perspective of the node, the condidates are the only nodes in that exist.
+A node a set of peers, and uses DGVH to determine which of these correspond to Delaunay peers and form a Voronoi region
+The resulting short peers are a subset of the nodes Delaunay neighbors/
+A crucial feature is that this subset guarantees  
 
 
 DGVH uses the midpoint to gauge which other nodes to use as its Delaunay triangulation \cite{dgvh}.
@@ -258,6 +260,9 @@ For each of the remaining candidates, the node calculates the midpoint between i
 If new peer list does not contain any nodes closer to the midpoint than the candidate, the candidate is added to the new peer list.
 Otherwise, the candidate is set aside.
 
+%TODO SIZEs of short peers and long peers expected sizes
+%TODO Algorithm complexity
+%TODO How do we hanlde long peers
 
 We have tested DGVH on Chord (a ring-based topology), Kademlia (a XOR-based tree topology), general Euclidean spaces, and even in a hyperbolic geometry.
 We show in Section \ref{sec:experiments} that DGVH works in all of these spaces.
