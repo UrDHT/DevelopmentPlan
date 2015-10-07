@@ -247,12 +247,13 @@ We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH), sh
 
 From the perspective of the node, the condidates are the only nodes in that exist.
 A node a set of peers, and uses DGVH to determine which of these correspond to Delaunay peers and form a Voronoi region
-The resulting short peers are a subset of the nodes Delaunay neighbors/
-A crucial feature is that this subset guarantees  
+The resulting short peers are a subset of the node's actual Delaunay neighbors.
+A crucial feature is that this subset guarantees that DGVH will form a routable mesh.
 
 
+\subsubsection*{Algorithm  Explanation}
 DGVH uses the midpoint to gauge which other nodes to use as its Delaunay triangulation \cite{dgvh}.
-Every maintenance cycle, nodes exchange their peer lists with\textbf{ a current neighbor and then recalculate their neighbors.  }
+Every maintenance cycle, nodes exchange their peer lists with their neighbors
 A node creates a list of candidates by combining their peer list with  their neighbor's peer list.
 This list of peers is then sorted from closest to furthest distance.
 The node then initializes a new peer list with the closest candidate.
@@ -260,10 +261,22 @@ For each of the remaining candidates, the node calculates the midpoint between i
 If new peer list does not contain any nodes closer to the midpoint than the candidate, the candidate is added to the new peer list.
 Otherwise, the candidate is set aside.
 
-%TODO SIZEs of short peers and long peers expected sizes
-%TODO Algorithm complexity
-%TODO How do we hanlde long peers
 
+\subsubsection*{How do we get Candidates}
+Candidates are gathered via the gossip protocol.
+
+\subsubsection*{Algorithm complexity}
+
+\subsubsection*{Sizes of short peers and long peers expected sizes and candidates}
+
+The expected maximum degree of a vertex in a Delaunay Triangulation in any number of dimensions is
+$\Theta(\frac{\log n}{\log \log n} )$ \cite{bern1991expected}. 
+So we can realistically expect \textit{short peers} to be bounded by $\Theta(\frac{\log n}{\log \log n} )$.
+
+\subsubsection*{How do we handle long peers}
+
+
+\subsubsection*{Lead to next}
 We have tested DGVH on Chord (a ring-based topology), Kademlia (a XOR-based tree topology), general Euclidean spaces, and even in a hyperbolic geometry.
 We show in Section \ref{sec:experiments} that DGVH works in all of these spaces.
 
@@ -276,23 +289,18 @@ We show in Section \ref{sec:experiments} that DGVH works in all of these spaces.
 	Our name states that all DHTs can spring from UrDHT.
 	
 	UrDHT is sectioned off into 3 broad components: Storage, Networking, and Logic.
-	Most of our discussion will focus on the Logic component, but 
+	Most of our discussion will focus on the Logic component.
 	
-	
-	Storage handles file storage.
-	T
-	
-	
-	and network dictates the protocol for how nodes communicate.
+	Storage handles file storage and network dictates the protocol for how nodes communicate.
 	These components deal with the lower level mechanics of how files are stored on the network and how bits are transmitted through the network.
-	Network Rest
 	The specifics are outside the scope of the paper, but can be found on the UrDHT Project \cite{urdht}.
+	
 	
 	The Logic component is what dictates the behavior of the DHT and the construction of the overlay network.
 	It is composed of two parts: the DHT protocol and the space math.
 	
 	The DHT protocol is the canonical operations that a DHT performs, while the space math is what effectively distinguishes one DHT from another.
-	The \texttt{space math} package in UrDHT is what needs to be changes to create a new type of DHT
+	The \texttt{space math} package in UrDHT is what needs to be changes to create a new type of DHT.
 	We discuss each in further detail below.
 	
 	
@@ -306,19 +314,25 @@ We show in Section \ref{sec:experiments} that DGVH works in all of these spaces.
 	Maintenance is gossip
 	\subsection{The Space Math}
 	The space math consists of the functions which define the DHTs topology.
+	Essentially this is the
 	
-	The distance and midpoints functions are defined and discussed in detail in Section \ref{sec:hyper}	
-	
-	
-	Space math just needs a Voronoi tessilation/ wahtever creator
+	Space math just needs a Voronoi tessellation/ whatever creator
 	We provide DGVH for this, which works in every case we've tried.
 	If you use DGVH, here's what needs to be changed.
 	
-	\subsubsection*{Put and Poll}
-	The functions of \texttt{store} and \texttt{get} can be further abstracted otu to \texttt{put} and \texttt{poll}
+	
+	\subsubsection{Distance}
+	\subsubsection{Midpoint}
+	\subsubsection{Get Closest}
+	\subsubsection{Get Delaunay (short) Peers}
+	\subsubsection{Long Peer Selection}
 	
 	
-	This does X
+	%\subsubsection*{Put and Poll}
+	%The functions of \texttt{store} and \texttt{get} can be further abstracted otu to \texttt{put} and \texttt{poll}
+	
+	
+	%This does X
 
 
 \section{Implementing other DHTs}
@@ -337,7 +351,13 @@ We show in Section \ref{sec:experiments} that DGVH works in all of these spaces.
 	This metric, while non-euclidean, is perfectly acceptable for calculating distance in Kademlia \cite{kademlia}
 	However, XOR does not have an intuitive midpoint we could use for DGVH.
 	
-	We found that
+	To solve this, we used the XOR metric defined by Kademlia as the distance function and the midpoint function.
+	
+	
+	We then implemented handle long peers.
+	
+	\subsection{Implementing A Euclidean Space}
+	
 	
 	\subsection{ZHT}
 	ZHT \cite{li2013zht} leads to an extremely trivial implementation in UrDHT.
@@ -350,6 +370,8 @@ We show in Section \ref{sec:experiments} that DGVH works in all of these spaces.
 	\label{sec:hyper}
 	
 
+	
+	
 	
 	\subsection{Okay, this is interesting, but why bother?}
 	Because we it was difficult
