@@ -35,11 +35,12 @@
 UrDHT is an abstracted Distributed Hash Table (DHT) that maps the topologies of DHTs to the primal-dual problem of Voronoi Tessellation and Delaunay Triangulation.
 Many of the DHTs have an inherent set of the same qualities, such as greedy routing, maintaining lists of peers which define the topology, and forming an overlay network. 
 By completing a few simple functions, a developer can implement the topology of any DHT in any arbitrary space.
+For example, we implemented a DHT operating in a hyperbolic space, a previously unexplored nontrivial metric space with potential applications.
 
-%Latency embedding
-One topology of particular interest we created is a DHT operating within a Poincar\'{e} disk model.
-This DHT has latency embedded within the overlay and capable of responding to changes in latency.
-The consequence of this is that, unlike other DHTs, the routing algorithm always uses the shortest latency path to a given destination.
+%Latency embedding will not be included in this paper
+%One topology of particular interest we created is a DHT operating within a Poincar\'{e} disk model.
+%This DHT could have latency embedded within the overlay and be capable of responding to changes in latency.
+%The consequence of this is that, unlike other DHTs, the routing algorithm always uses the shortest latency path to a given destination.
 
 	
 \end{abstract}
@@ -73,13 +74,17 @@ In that paper, we discovered that all DHTs can cleanly be mapped to the primal-d
 
 UrDHT directly builds its topology using this insight, using a greedy distributed heuristic for approximating Deluanay triangulations.
 It is our specification of an abstract DHT, which can be used to build of DHTs.
-We found that we could reproduce the topology of different DHTs by defining the necessary distance and midpoint functions for the space.  %TODO and what else
+We found that we could reproduce the topology of different DHTs by defining a selection heuristic and rejection algorith for the space.
+For every DHT we tried, fast approximation of Delaunay triangulation using a distance and midpoint functions for the space produced a stable DHT.  
+This works in non-eulcidean spaces such as XOR (Kademelia) or even a hyperbolic space represented by a Poincar\`{e} disc.
 
-The end result is not only do we have an abstracted DHT, we have a simple framework that developers can use to quickly create new distributed applications and frameworks.
+The end result is not only do we have an abstract model of DHTs, we have a simple framework that developers can use to quickly create new distributed applications.
+This simple framework allows generation of internally consistent implementations of different DHTs that can have their performance rigorously compared.  %IE we can now test DHTs against each other fairly
+
 
 
 \subsubsection{Bootstrapping}
-Another ambiguous issue with DHTs and DHT-based P2P applications we wish to address with UrDHT is the what we have termed the \textit{bootstrapping problem}.
+Another poorly addressed issue with DHTs and DHT-based P2P applications we wish to address with UrDHT is the what we have termed the \textit{bootstrapping problem}.
 Simply put, a node can only join the network if it knows another node that is already a member of the network it is trying to join.
 %
 %Current distributed systems suffer from fragmentation, high overhead, and an inability to scale due to difficulty of adoption.
@@ -88,8 +93,8 @@ Simply put, a node can only join the network if it knows another node that is al
 
 %How does CAN address this or Kademlia or Chord
 
-The general way this works is by having a potential user manually look up the bootstrapping information needed at a centralized source, such as the project or application's website.
-There is a philosophical conflict here: a distributed application using a centralized source of information to build a distributed network.
+The general way this works is by having a potential user manually look up at a centralized source, such as the project or application's website, the bootstrapping information.
+It is a philosophical conflict required a distributed application using a centralized source of information to build a distributed network.
 
 
 %UrDHT is P2P system designed to improve the adaptability of P2P distributed serves.
@@ -99,34 +104,33 @@ There is a philosophical conflict here: a distributed application using a centra
 %What topology do you use?
 %How do we want our program to communicate over the network?
 
-UrDHT exists to simplify this process, minimizing the distributed application development time and making it easier to adopt by creating a network to bootstrap \textit{other networks}.
+UrDHT has the potential to be a distributed source for joining the distributed application development time and making it easier to adopt by creating a network to bootstrap \textit{other networks}.
 UrDHT does this by making it easy to add other networks as a service.
 
 
 
-\subsubsection{Embedding}
-One of the other features shared by nearly every DHT is that routing works by minimizing the number of hops across the overlay network, with all hops treated as the same length.
-This is done because it is assumed that DHTs know nothing about the state of actual infrastructure the overlay is built upon.
+%\subsubsection{Embedding}
+%One of the other features shared by nearly every DHT is that routing works by minimizing the number of hops across the overlay network, with all hops treated as the same length.
+%This is done because it is assumed that DHTs know nothing about the state of actual infrastructure the overlay is built upon.
 
-However, this means that most DHTs will happily route a message from one continent to another and back.
-This is obviously undesirable, but it is the status quo in DHTs.
-This stems from the generation of node IDs in DHTs. 
-Nodes are typically assigned a point in the range of a cryptographic hash funtion, called the keyspace. 
-This ID corresponds to the hash of some identifier or given a point randomly.
-This is done for purposes of load balancing and fault tolerance.
+%However, this means that most DHTs will happily route a message from one continent to another and back.
+%This is obviously undesirable, but it is the status quo in DHTs.
+%This stems from the generation of node IDs in DHTs. 
+%Nodes are typically assigned a point in the range of a cryptographic hash funtion, called the keyspace. 
+%This ID corresponds to the hash of some identifier or given a point randomly.
+%This is done for purposes of load balancing and fault tolerance.
 
-We asked ourselves if there was a means of embedding latency into the DHT, while still maintaining the system's fault tolerance.
-Doing so would mean that the hops traversed to a destination are, in fact, the shortest path to the destination.
+%We asked ourselves if there was a means of embedding latency into the DHT, while still maintaining the system's fault tolerance.
+%Doing so would mean that the hops traversed to a destination are, in fact, the shortest path to the destination.
 
-We found that we could embed a latency graph in a hyperbolic space and defined UrDHT such that it operates within this space.
-The end result was a DHT with latency embedded into the overlay.
-Nodes can respond to changes in latency and the network by effectively moving their positions.
+%We found that we could embed a latency graph in a hyperbolic space and defined UrDHT such that it operates within this space.
+%The end result was a DHT with latency embedded into the overlay.
+%Nodes can respond to changes in latency and the network by effectively moving their positions.
 %We use  a force spring model to accomplish this.
 
 \subsubsection*{Accomplishments}
 To summarize our accomplishments:
 
-%TODO DO THIS FIRST
 \begin{itemize}
 	%\item We first discuss our motivation for creating UrDHT and \textit{creating it the way we did}  (Section \ref{sec:motivation}).
 	\item We give a formal specification for what needs to be defined in order to create a functioning DHT.
@@ -140,7 +144,7 @@ To summarize our accomplishments:
 	
 	\item We present UrDHT as an abstract DHT and show how a developer can tweak the functions we defined to create an arbitrary new DHT topology (Section \ref{sec:urdht}).
 	\item We show how to reproduce the topology of Chord and Kademlia using UrDHT, which we call UrChord and UrKademlia (Section \ref{sec:implement}).
-	\item We show how we can embed latency into the overlay of a DHT by placing the DHT into and defining the necessary methods so that DGVH can run in that space  (Section \ref{sec:hyper}).
+	%\item We show how we can embed latency into the overlay of a DHT by placing the DHT into and defining the necessary methods so that DGVH can run in that space  (Section \ref{sec:hyper}).
 	
 	\item We conduct experiments showing that UrChord sufficiently approximates a correct implementation of Chord (Section \ref{sec:experiments}). 
 	\item We discuss the ramifications of our work and what future work is available.
@@ -164,6 +168,8 @@ We show that Distributed Hash Tables are just Voronoi tessellations and Delaunay
 
 \subsection{DHT Components}
 The following functions need to be defined in order for nodes to perform lookup operations and determine responsibility.
+
+%TODO Which of theses are the discrimination metric
 \begin{itemize}
 	\item \textbf{A \texttt{distance} function } - 
 	This measures distance in the overlay formed by the Distributed Hash Table.
@@ -289,12 +295,14 @@ Otherwise, the candidate is set aside.
 	UrDHT is sectioned off into 3 broad components: database, network, and logic.
 	Database handles file storage and network dictates the protocol for how nodes communicate.
 	These components deal with the lower level mechanics of how files are stored on the network and how bits are transmitted through the network.
+	Network Rest
 	The specifics are outside the scope of the paper, but can be found on the UrDHT Project \cite{urdht}.
 	
 	The Logic component is what dictates the behavior of the DHT and the construction of the overlay network.
 	It is composed of two parts: the DHT protocol and the space math.
 	
 	The DHT protocol is the canonical operations that a DHT performs, while the space math is what effectively distinguishes one DHT from another.
+	The \texttt{space math} package in UrDHT is what needs to be changes to create a new type of DHT
 	We discuss each in further detail below.
 	
 	
@@ -303,12 +311,18 @@ Otherwise, the candidate is set aside.
 	The DHT protocol is the shared functionality between every single DHT.
 	It consists of the node's information, the short peer list to define the overlay, the long peers that make efficient routing possible, and a bunch of other stuff.
 	
+	Networking
 	
-	
+	Maintenense is gossip
 	\subsection{The Space Math}
 	The space math consists of the functions which define the DHTs topology.
 	
 	The distance and midpoints functions are defined and discussed in detail in Section \ref{sec:hyper}	
+	
+	
+	Space math just needs a Voronoi tessilation/ wahtever creator
+	We provide DGVH for this, which works in every case we've tried.
+	If you use DGVH, here's what needs to be changed.
 	
 	\subsubsection*{Put and Poll}
 	The functions of \texttt{store} and \texttt{get} can be further abstracted otu to \texttt{put} and \texttt{poll}
@@ -335,16 +349,22 @@ Otherwise, the candidate is set aside.
 	
 	\subsection{ZHT}
 	ZHT \cite{li2013zht} leads to an extremely trivial implementation in UrDHT.
+	ZHT is effectively Clique
 	
-\section{DHTs in a Hyperbolic Topology}
+	There is couple ways to solve this.
+	
+	\subsection{DHTs in a Hyperbolic Topology}
 	
 	\label{sec:hyper}
 	
 
 	
 	\subsection{Okay, this is interesting, but why bother?}
+	Because we it was difficult
 	
-	Hyperbolic spaces allow us to cleanly embed scale free graphs
+	Because it shows that UrDHT and DGVH both work in arbitrary geometries.
+	For example, handling geographic coordinates. 
+	
 	
 	\subsection{Wait, Nodes can move in DHTs??}
 	Yes, they can.  
@@ -357,11 +377,12 @@ Otherwise, the candidate is set aside.
 \section{Experiments}
 \label{sec:experiments}
 
-We are doing simulations. 
+We use simulations to test our DHTs.
+Using simulations to test the correctness and relative performance of DHTs
 This is standard practice in both whitepapers and applications
 Citations are all major DHTs
 Citations for analysis works that use simulations
-Citations for applications of DHTs that were peer reviewed and accepted uing simulations
+Citations for applications of DHTs that were peer reviewed and accepted using simulations
 
 
 
@@ -381,6 +402,11 @@ We showed in worked in DGVH, it should work in a hyperbolic space.
 
 \section{Future Work and Conclusions}
 \label{sec:future}
+
+Move Latency embedding section from intro to here
+
+
+Hyperbolic spaces allow us to cleanly embed scale free graphs
 
 \bibliography{mine,dht,voronoi}
 \bibliographystyle{plain}
