@@ -248,7 +248,6 @@ We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH), sh
 		%\ENDIF
 	\end{algorithmic}
 \end{algorithm} 
-%TODO IS THIS HOW WE IMPLEMENT IT IN URDHT? DO WE CHOOSE just one peer in gossip?
 %TODO short or all peers
 
 
@@ -267,25 +266,22 @@ The node then initializes a new peer list with the closest candidate.
 For each of the remaining candidates, the node calculates the midpoint between itself and the candidate.
 If new peer list does not contain any nodes closer to the midpoint than the candidate, the candidate is added to the new peer list.
 Otherwise, the candidate is set aside.
-
-
-
-\subsubsection*{How do we handle long peers}
 How long peers are handled depends on the particular DHT implementation.
 
+We do not include a minimum size for candidates
 
-\subsubsection*{How do we get Candidates}
+%\subsubsection*{How do we get Candidates}
 Candidates are gathered via a gossip protocol as well as notifications from close peers.
 This process is described more in Section \ref{sec:protocol}.
 
+%\subsubsection*{Sizes of short peers and long peers expected sizes and candidates}
 
-\subsubsection*{Sizes of short peers and long peers expected sizes and candidates}
-The expected maximum degree of a vertex in a Delaunay Triangulation in any number of dimensions is
-$\Theta(\frac{\log n}{\log \log n} )$ \cite{bern1991expected}. 
-So we can realistically expect \textit{short peers} to be bounded by $\Theta(\frac{\log n}{\log \log n} )$.
+The expected maximum size of $ candidates $ corresponds to the expected maximum degree of a vertex.
+For a Delaunay Triangulation in any number of dimensions is $\Theta(\frac{\log n}{\log \log n} )$ \cite{bern1991expected}. 
+We can therefore expect \textit{short peers} to be bounded by $\Theta(\frac{\log n}{\log \log n} )$.
 
 \subsubsection*{Algorithm complexity}
-We showed that the expected worst case cost of \(O(\frac{\log^{2} n}{\log^{2} \log n} )\) \cite{dgvh}, regardless of the dimension.
+The expected worst case cost of \(O(\frac{\log^{2} n}{\log^{2} \log n} )\) \cite{dgvh}, regardless of the dimension.
 
 
 
@@ -360,7 +356,7 @@ Depending on what you want to measure, \texttt{getClosest} might measure the dis
 We then use the above functions to implement  \texttt{getDelaunayPeers}.
 Given a set of points, the $ candidates$, and a center point $ centers$, \texttt{getDelaunayPeers} calculates a mesh that of the Delaunay peers of $ center$.
 
-We assume that this is done using DGVH,  shown the Python code used
+We assume that this is done using DGVH, shown the Python code used
 in Listing \ref{lst:dgvh}
 
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,  breaklines=true, caption={\texttt{getDelaunayPeers()}}, label={lst:dgvh}, frame=single] 
@@ -383,7 +379,10 @@ def getDelaunayPeers(candidates,center):
 \end{lstlisting}
 
 
-\subsubsection{Long Peer Selection}
+\subsubsection{Handle Long Peers}
+
+The final function is \texttt{handleLongPeers}.
+The implementation of this function should vary greatly from one DHT to another.
 
 
 
@@ -396,34 +395,34 @@ def getDelaunayPeers(candidates,center):
 
 \section{Implementing other DHTs}
 \label{sec:implement}
-	\subsection{Implementing Chord and Ring-Based Topology}
-	
-	Ring topologies are fairly straightforward since they act as are one dimensional Voronoi Tesselations, splitting up what is effectively a modular number line among multiple nodes.
-	
-	We know Chord's invariants aren't (citation), but our protocol isn't affected by these constraints
-	
-	
-	\subsection{Implementing Kademlia and Other Tree Based Topologies}
-	Trees are easy to embed in a hyperbolic space.
-	
-	The largest complication in implementing UrKademlia is defining the exclusive or, or XOR, metric which is used for distance.
-	This metric, while non-euclidean, is perfectly acceptable for calculating distance in Kademlia \cite{kademlia}
-	However, XOR does not have an intuitive midpoint we could use for DGVH.
-	
-	To solve this, we used the XOR metric defined by Kademlia as the distance function and the midpoint function.
-	
-	
-	We then implemented handle long peers.
-	
-	\subsection{Implementing A Euclidean Space}
-	
-	
-	\subsection{ZHT}
-	ZHT \cite{li2013zht} leads to an extremely trivial implementation in UrDHT.
-	ZHT is effectively Clique
-	
-	There is couple ways to solve this.
-	
+\subsection{Implementing Chord and Ring-Based Topology}
+
+Ring topologies are fairly straightforward since they act as are one dimensional Voronoi Tesselations, splitting up what is effectively a modular number line among multiple nodes.
+
+We know Chord's invariants are not (citation), but our protocol isn't affected by these constraints
+
+
+\subsection{Implementing Kademlia and Other Tree Based Topologies}
+The largest complication in implementing UrKademlia is defining the exclusive or, or XOR, metric which is used for distance.
+This metric, while non-euclidean, is perfectly acceptable for calculating distance in Kademlia \cite{kademlia}
+However, XOR does not have an intuitive midpoint we could use for DGVH.
+
+To solve this, we used the XOR metric defined by Kademlia as the distance function and the midpoint function.
+
+
+
+We then implemented handle long peers.
+
+\subsection{Implementing A Euclidean Space}
+
+
+\subsection{ZHT}
+ZHT \cite{li2013zht} leads to an extremely trivial implementation in UrDHT.
+Unlike other DHTs, ZHT assumes an extremely low rate of churn.
+As a result, the topology of ZHT is a clique, with each node having an edge to all other nodes, yielding $ O(1) $ lookup times.
+
+The only change that needs to be made is to \texttt{handleLongPeers}.
+We just place no upper bound on the size of the list of Long Peers.
 \subsection{DHTs in a Hyperbolic Topology}
 	
 \label{sec:hyper}
@@ -460,7 +459,7 @@ What are our experiments?
 
 \subsection{UrDHT Cohesion Euclidean Space}
 
-%TODO show DGVH is the bomb in 1D cause 1D is easy
+
 
 \subsection{Cohesion in hyperbolic space}
 We showed in worked in DGVH, it should work in a hyperbolic space.
