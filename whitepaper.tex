@@ -141,7 +141,7 @@ The following functions need to be defined in order for nodes to perform lookup 
 
 %TODO Which of theses are the discrimination metric
 \begin{itemize}
-	\item \textbf{A \texttt{distance} function } - 
+	\item \textbf{A \texttt{distance} function } -
 	This measures distance in the overlay formed by the Distributed Hash Table.
 	In most DHTs, the distance in the overlay has no correlation with real-world attributes.
 	This is not necessarily the case with UrDHT (see Section \ref{sec:hyper}).
@@ -258,9 +258,10 @@ A crucial feature is that this subset guarantees that DGVH will form a routable 
 
 
 \subsubsection*{Algorithm  Explanation}
+%TODO Reconcile with previous paper
 DGVH uses the midpoint to gauge which other nodes to use as its Delaunay triangulation \cite{dgvh}.
-Every maintenance cycle, nodes exchange their peer lists with their neighbors
-A node creates a list of candidates by combining their peer list with  their neighbor's peer list.
+Every maintenance cycle, nodes exchange their peer lists with their neighbors.
+A node creates a list of candidates by combining their peer list with their neighbor's peer list. \footnote{In our previous paper, nodes exchange peer lists with a single peer. Calls to DGVH in this paper use all the }
 This list of peers is then sorted from closest to furthest distance.
 The node then initializes a new peer list with the closest candidate.
 For each of the remaining candidates, the node calculates the midpoint between itself and the candidate.
@@ -268,7 +269,6 @@ If new peer list does not contain any nodes closer to the midpoint than the cand
 Otherwise, the candidate is set aside.
 How long peers are handled depends on the particular DHT implementation.
 
-We do not include a minimum size for candidates
 
 %\subsubsection*{How do we get Candidates}
 Candidates are gathered via a gossip protocol as well as notifications from close peers.
@@ -281,9 +281,10 @@ For a Delaunay Triangulation in any number of dimensions is $\Theta(\frac{\log n
 We can therefore expect \textit{short peers} to be bounded by $\Theta(\frac{\log n}{\log \log n} )$.
 
 \subsubsection*{Algorithm complexity}
-The expected worst case cost of \(O(\frac{\log^{2} n}{\log^{2} \log n} )\) \cite{dgvh}, regardless of the dimension.
+%TODO square the below
+The expected worst case cost of \(O(\frac{\log^{4} n}{\log^{4} \log n} )\) \cite{dgvh}, regardless of the dimension \cite{dgvh}. \footnote{As mentioned in the previous footnote, if we are exchanging peers with a single neighbor rather than all our neighbors, the cost lowers to \(O(\frac{\log^{2} n}{\log^{2} \log n} )\).}
 
-
+It most cases, this cost much lower, on the order of is $ O(dk\log(k) + k^{2} ) $ for $ d $ dimensions and $ k $ candidates.
 
 \subsubsection*{Lead to next}
 We have tested DGVH on Chord (a ring-based topology), Kademlia (a XOR-based tree topology), general Euclidean spaces, and even in a hyperbolic geometry.
@@ -313,18 +314,32 @@ We discuss each in further detail below.
 
 \subsection{The DHT Protocol }
 \label{sec:protocol}
-%TODO in case of conflict with reality, move components from one section to another
+
 The DHT Protocol is the shared functionality between every single DHT.
-It consists of the node's information, the short peer list to define the overlay, the long peers that make efficient routing possible, and and all the functions that use them.
-
-In our efforts to further abstract DHTs, we have implemented \texttt{lookup} using a new method \texttt{seek}.
-\texttt{seek} acts acts a single step of \texttt{lookup} and returns the closest node to $ key $ that the node knows about.
-
-The \texttt{join} operation takes in a set of
+It consists of the node's information, the short peer list to define the overlay, the long peers that make efficient routing possible, and all the functions that use them.
 
 
-Maintenance is gossip
+
+
+In our efforts to further abstract DHTs, we have implemented \texttt{lookup} using the function \texttt{seek}.
+The \texttt{seek} function acts a single step of \texttt{lookup}.
+It returns the closest node to $ key $ that the node knows about.
+Nodes perform \texttt{lookup} by iteratively calling \texttt{seek} until it receives the same answer twice.
+
+
+The \texttt{join} operation takes in a set of bootstrap nodes, called $ candidates $.
+The joining node randomly selects one of these $ candidates $ and finds the ``parent'' node currently responsible for the space.
+The joining node then populates its short peers using the ``parent'' node's short peers.
+The node  uses the parent to populate its short peer list and then makes it aware of its existence using \texttt{notify}.
+Once that has been finished, the joining node starts its maintenance thread.
+
+
+%TODO check truth
+Maintenance is done via gossip.
+Each maintenance cycle, the node recalculates its Delaunay (short) peers using its neighbor's peer list 
+
 \subsection{The Space Math}
+\label{sec:space}
 The space math consists of the functions which define the DHTs topology.
 Essentially this is the
 
@@ -348,6 +363,7 @@ The prime example of this is Chord, which is a unidirectional toroidal ring.
 \subsubsection{Midpoint}
 
 Similarly to distance, \texttt{midpoint} takes in the points $ a $ and $ b $ and returns the closest midpoint\footnote{Toroidal spaces have more than one midpoint.} between the two.
+
 \subsubsection{Get Closest}
 The function \texttt{getClosest} returns the point closest to $ center$ from a list of $ candidates$, measured by the distance function.
 Depending on what you want to measure, \texttt{getClosest} might measure the distance from $ center$ to each of the candidates or from each of the candidates to the $ center$.
@@ -384,7 +400,7 @@ def getDelaunayPeers(candidates,center):
 The final function is \texttt{handleLongPeers}.
 The implementation of this function should vary greatly from one DHT to another.
 
-
+In some case it may more convienent implement \texttt{handleLongPeers} as part of \texttt{getDelaunayPeers}
 
 %\subsubsection*{Put and Poll}
 %The functions of \texttt{store} and \texttt{get} can be further abstracted otu to \texttt{put} and \texttt{poll}
@@ -444,7 +460,7 @@ We just place no upper bound on the size of the list of Long Peers.
 	In fact, it helps.
 	
 	\subsection{Services}
-	
+	\texttt{put}  \texttt{poll}
 	
 \section{Experiments}
 \label{sec:experiments}
