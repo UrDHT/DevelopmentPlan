@@ -361,21 +361,21 @@ in Listing \ref{lst:dgvh}
 
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,  breaklines=true, caption={\texttt{getDelaunayPeers()}}, label={lst:dgvh}, frame=single] 
 def getDelaunayPeers(candidates,center):    
-    if len(candidates) < 2:
-	    return candidates
-    sortedCandidates = sorted(candidates, key=lambda x: distance(x, center))
-    peers = [sortedCandidates[0]] 
-    sortedCandidates = sortedCandidates[1:]
-    for c in sortedCandidates:
-	    m = midpoint(c, center)
-	    accept = True
-	    for p in peers:
-		    if distance(m,p) < distance(m, center):  
-			    accept = False
-			    break
-	    if accept:
-		    peers.append(c)
-    return peers
+	if len(candidates) < 2:
+		return candidates
+	sortedCandidates = sorted(candidates, key=lambda x: distance(x, center))
+	peers = [sortedCandidates[0]] 
+	sortedCandidates = sortedCandidates[1:]
+	for c in sortedCandidates:
+		m = midpoint(c, center)
+		accept = True
+		for p in peers:
+			if distance(m,p) < distance(m, center):  
+				accept = False
+				break
+		if accept:
+			peers.append(c)
+	return peers
 \end{lstlisting}
 
 
