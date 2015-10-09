@@ -141,10 +141,8 @@ The following functions need to be defined in order for nodes to perform lookup 
 
 %TODO Which of theses are the discrimination metric
 \begin{itemize}
-	\item \textbf{A \texttt{distance} function } -
-	This measures distance in the overlay formed by the Distributed Hash Table.
+	\item \textbf{A \texttt{distance} function } - This measures distance in the overlay formed by the Distributed Hash Table.
 	In most DHTs, the distance in the overlay has no correlation with real-world attributes.
-	This is not necessarily the case with UrDHT (see Section \ref{sec:hyper}).
 	
 	\item \textbf{A \texttt{midpoint} function} - This calculates the minimally equidistant point between two given point.
 	The midpoint is required for Delaunay triangulation calculation.
@@ -193,7 +191,6 @@ Despite this, the base greedy algorithm is always the same between implementatio
 
 The final component is a consistent hashing function.
 This function must generate keys large enough to make the chances of a hash collision nigh impossible.
-%LEAD INTO MULTIHASH GOES HERE
 
 
 
@@ -251,13 +248,12 @@ We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH), sh
 %TODO short or all peers
 
 
-From the perspective of the node, the candidates are the only nodes in that exist.
-A node a set of peers, and uses DGVH to determine which of these correspond to Delaunay peers and form a Voronoi region
+A node takes a set of peers and uses DGVH to determine which of these correspond to Delaunay peers.
+From the perspective of the node, the candidates are the only nodes that exist.
 The resulting short peers are a subset of the node's actual Delaunay neighbors.
 A crucial feature is that this subset guarantees that DGVH will form a routable mesh.
 
 
-\subsubsection*{Algorithm  Explanation}
 %TODO Reconcile with previous paper
 DGVH uses the midpoint to gauge which other nodes to use as its Delaunay triangulation \cite{dgvh}.
 Every maintenance cycle, nodes exchange their peer lists with their neighbors.
@@ -270,23 +266,16 @@ Otherwise, the candidate is set aside.
 How long peers are handled depends on the particular DHT implementation.
 
 
-%\subsubsection*{How do we get Candidates}
 Candidates are gathered via a gossip protocol as well as notifications from close peers.
 This process is described more in Section \ref{sec:protocol}.
 
-%\subsubsection*{Sizes of short peers and long peers expected sizes and candidates}
-
 The expected maximum size of $ candidates $ corresponds to the expected maximum degree of a vertex.
 For a Delaunay Triangulation in any number of dimensions is $\Theta(\frac{\log n}{\log \log n} )$ \cite{bern1991expected}. 
-We can therefore expect \textit{short peers} to be bounded by $\Theta(\frac{\log n}{\log \log n} )$.
+We can therefore expect \textit{short peers} to be bounded by $\Theta(\frac{\log n}{\log \log n})$.
 
-\subsubsection*{Algorithm complexity}
-%TODO square the below
 The expected worst case cost of \(O(\frac{\log^{4} n}{\log^{4} \log n} )\) \cite{dgvh}, regardless of the dimension \cite{dgvh}. \footnote{As mentioned in the previous footnote, if we are exchanging peers with a single neighbor rather than all our neighbors, the cost lowers to \(O(\frac{\log^{2} n}{\log^{2} \log n} )\).}
-
 It most cases, this cost much lower, on the order of is $ O(dk\log(k) + k^{2} ) $ for $ d $ dimensions and $ k $ candidates.
 
-\subsubsection*{Lead to next}
 We have tested DGVH on Chord (a ring-based topology), Kademlia (a XOR-based tree topology), general Euclidean spaces, and even in a hyperbolic geometry.
 We show in Section \ref{sec:experiments} that DGVH works in all of these spaces.
 
@@ -305,19 +294,20 @@ These components deal with the lower level mechanics of how files are stored on 
 The specifics are outside the scope of the paper, but can be found on the UrDHT Project \cite{urdht}.
 
 Most of our discussion will focus on the Logic component.
-The Logic component is what dictates the behavior of the DHT and the construction of the overlay network.
+The Logic component is what dictates the behavior of node within the DHT and the construction of the overlay network.
 It is composed of two parts: the DHT Protocol and the Space Math.
 
-The DHT Protocol is the canonical operations that a DHT performs, while the space math is what effectively distinguishes one DHT from another.
+The DHT Protocol contains the canonical operations that a DHT performs, while the Space Math is what effectively distinguishes one DHT from another.
 A developer only needs to change the details of the \texttt{space math} package in UrDHT to create a new type of DHT.
 We discuss each in further detail below.
 
 \subsection{The DHT Protocol }
 \label{sec:protocol}
 
-The DHT Protocol is the shared functionality between every single DHT.
+The DHT Protocol (\texttt{LogicClass.py}) is the shared functionality between every single DHT.
 It consists of the node's information, the short peer list to define the overlay, the long peers that make efficient routing possible, and all the functions that use them.
-
+There is no need for a developer to change anything in the DHT Protocol, but it can be modified if so desired.
+The DHT Protocol depends on functions from Space Math in order to perform operations within the specified space.
 
 
 
@@ -334,18 +324,19 @@ The node  uses the parent to populate its short peer list and then makes it awar
 Once that has been finished, the joining node starts its maintenance thread.
 
 
+
 %TODO check truth
 Maintenance is done via gossip.
-Each maintenance cycle, the node recalculates its Delaunay (short) peers using its neighbor's peer list 
+Each maintenance cycle, the node recalculates its Delaunay (short) peers using its neighbor's peer list and any nodes that have notified it since the last maintance cycle.
+This is done using DGVH by default, but could be done with some other algorithm.
+Once those are calculated, the node handles modifying it's long peers, as dictated by the \texttt{handleLongPeers} function described in Section \ref{sec:space}.
 
 \subsection{The Space Math}
 \label{sec:space}
-The space math consists of the functions which define the DHTs topology.
-Essentially this is the
-
-Space math just needs a Voronoi tessellation/ whatever creator
-We provide DGVH for this, which works in every case we've tried.
-If you use DGVH, here's what needs to be changed.
+The space math consists of the functions which define the DHT's topology.
+It requires a way to generate short peers to form a routable overlay and a way to generate long peers.
+We provide DGVH for generating short peers, which works in every space we have tried.
+Space Math requires the following functions when using DGVH:
 
 \subsubsection{IDToPoint}
 The \texttt{idToPoint} function takes in a node's ID and any other attributes needed to map an ID onto a point in the space.
@@ -362,7 +353,7 @@ The prime example of this is Chord, which is a unidirectional toroidal ring.
 
 \subsubsection{Midpoint}
 
-Similarly to distance, \texttt{midpoint} takes in the points $ a $ and $ b $ and returns the closest midpoint\footnote{Toroidal spaces have more than one midpoint.} between the two.
+Similarly to \texttt{distance}, \texttt{midpoint} takes in the points $ a $ and $ b $ and returns the closest midpoint\footnote{Toroidal spaces have more than one midpoint.} between the two.
 
 \subsubsection{Get Closest}
 The function \texttt{getClosest} returns the point closest to $ center$ from a list of $ candidates$, measured by the distance function.
@@ -372,8 +363,10 @@ Depending on what you want to measure, \texttt{getClosest} might measure the dis
 We then use the above functions to implement  \texttt{getDelaunayPeers}.
 Given a set of points, the $ candidates$, and a center point $ centers$, \texttt{getDelaunayPeers} calculates a mesh that of the Delaunay peers of $ center$.
 
-We assume that this is done using DGVH, shown the Python code used
+We assume that this is done using DGVH, shown the Python code 
 in Listing \ref{lst:dgvh}
+
+%TODO  I don't see any minimums here
 
 \begin{lstlisting}[basicstyle=\footnotesize\ttfamily,  breaklines=true, caption={\texttt{getDelaunayPeers()}}, label={lst:dgvh}, frame=single] 
 def getDelaunayPeers(candidates,center):    
@@ -398,9 +391,16 @@ def getDelaunayPeers(candidates,center):
 \subsubsection{Handle Long Peers}
 
 The final function is \texttt{handleLongPeers}.
-The implementation of this function should vary greatly from one DHT to another.
+\texttt{handleLongPeers} takes in a $ candidates $ and a $ center$, much like \texttt{getDelaunayPeers}, and returns .
+%TODO it actually raises the question, how should it work?  Since we shouldn't recalculate long peers from scratch every time.
 
-In some case it may more convienent implement \texttt{handleLongPeers} as part of \texttt{getDelaunayPeers}
+The implementation of this function should vary greatly from one DHT to another.
+For example, long peers in Symphony \cite{symphony} and other small-world \cite{kleinberg2000navigation} networks choose long peers using a probability distribution.
+Chord has a much more structured distribution, with each long peer being an increasing power of 2 distance away from the node \cite{chord}.
+
+
+
+In some case it may more convenient implement \texttt{handleLongPeers} as part of \texttt{getDelaunayPeers}.
 
 %\subsubsection*{Put and Poll}
 %The functions of \texttt{store} and \texttt{get} can be further abstracted otu to \texttt{put} and \texttt{poll}
@@ -414,6 +414,8 @@ In some case it may more convienent implement \texttt{handleLongPeers} as part o
 \subsection{Implementing Chord and Ring-Based Topology}
 
 Ring topologies are fairly straightforward since they act as are one dimensional Voronoi Tesselations, splitting up what is effectively a modular number line among multiple nodes.
+
+
 
 We know Chord's invariants are not (citation), but our protocol isn't affected by these constraints
 
@@ -431,6 +433,8 @@ We then implemented handle long peers.
 
 \subsection{Implementing A Euclidean Space}
 
+Euclidean space was the default space we used when building UrDHT.
+
 
 \subsection{ZHT}
 ZHT \cite{li2013zht} leads to an extremely trivial implementation in UrDHT.
@@ -444,23 +448,18 @@ We just place no upper bound on the size of the list of Long Peers.
 \label{sec:hyper}
 	
 
-	
-	
-	
-	\subsection{Okay, this is interesting, but why bother?}
-	Because we it was difficult
-	
-	Because it shows that UrDHT and DGVH both work in arbitrary geometries.
-	For example, handling geographic coordinates. 
-	
-	
-	\subsection{Wait, Nodes can move in DHTs??}
-	Yes, they can.  
-	There's no rule against it. 
-	In fact, it helps.
-	
-	\subsection{Services}
-	\texttt{put}  \texttt{poll}
+
+
+
+\subsubsection{Okay, this is interesting, but why bother?}
+Because we it was difficult
+
+Because it shows that UrDHT and DGVH both work in arbitrary geometries.
+For example, handling geographic coordinates. 
+
+
+\subsection{Services}
+\texttt{put}  \texttt{poll}
 	
 \section{Experiments}
 \label{sec:experiments}
@@ -490,26 +489,30 @@ We showed in worked in DGVH, it should work in a hyperbolic space.
 \section{Future Work and Conclusions}
 \label{sec:future}
 
-Move Latency embedding section from intro to here
+%Restate the intro
+UrDHT 
 
 
-%\subsubsection{Embedding}
-%One of the other features shared by nearly every DHT is that routing works by minimizing the number of hops across the overlay network, with all hops treated as the same length.
-%This is done because it is assumed that DHTs know nothing about the state of actual infrastructure the overlay is built upon.
+%Future stuff
+There are numerous routes 
 
-%However, this means that most DHTs will happily route a message from one continent to another and back.
-%This is obviously undesirable, but it is the status quo in DHTs.
-%This stems from the generation of node IDs in DHTs. 
-%Nodes are typically assigned a point in the range of a cryptographic hash funtion, called the keyspace. 
-%This ID corresponds to the hash of some identifier or given a point randomly.
-%This is done for purposes of load balancing and fault tolerance.
+Creating a DHT overlay that operates in a hyperbolic geometry
+One of the other features shared by nearly every DHT is that routing works by minimizing the number of hops across the overlay network, with all hops treated as the same length.
+This is done because it is assumed that DHTs know nothing about the state of actual infrastructure the overlay is built upon.
 
-%We asked ourselves if there was a means of embedding latency into the DHT, while still maintaining the system's fault tolerance.
-%Doing so would mean that the hops traversed to a destination are, in fact, the shortest path to the destination.
+However, this means that most DHTs will happily route a message from one continent to another and back.
+This is obviously undesirable, but it is the status quo in DHTs.
+This stems from the generation of node IDs in DHTs. 
+Nodes are typically assigned a point in the range of a cryptographic hash funtion, called the keyspace. 
+This ID corresponds to the hash of some identifier or given a point randomly.
+This is done for purposes of load balancing and fault tolerance.
 
-%We found that we could embed a latency graph in a hyperbolic space and defined UrDHT such that it operates within this space.
-%The end result was a DHT with latency embedded into the overlay.
-%Nodes can respond to changes in latency and the network by effectively moving their positions.
+We want to see if there is a means of embedding latency into the DHT, while still maintaining the system's fault tolerance.
+Doing so would mean that the hops traversed to a destination are, in fact, the shortest path to the destination.
+
+We believe we can embed a latency graph in a hyperbolic space and define UrDHT such that it operates within this space.
+The end result would be a DHT with latency embedded into the overlay.
+Nodes would respond to changes in latency and the network by rejoining the network at new positions.
 %We use  a force spring model to accomplish this.
 
 
