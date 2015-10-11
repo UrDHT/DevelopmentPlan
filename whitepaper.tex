@@ -424,7 +424,7 @@ Ring topologies are fairly straightforward since they act as are one dimensional
 
 
 
-We know Chord's invariants are not (citation), but our protocol isn't affected by these constraints
+%We know Chord's invariants are not (citation), but our protocol isn't affected by these constraints
 
 
 \subsection{Implementing Kademlia and Other Tree Based Topologies}
@@ -438,9 +438,10 @@ To solve this, we used the XOR metric defined by Kademlia as the distance functi
 
 We then implemented handle long peers.
 
-\subsection{Implementing A Euclidean Space}
+\subsection{Implementing A DHT in an Arbitrary Euclidean Geometry}
 
-Euclidean space was the default space we used when building UrDHT.
+A Euclidean space was the default space we used when building UrDHT and DGVH \cite{dgvh}.
+
 
 
 \subsection{ZHT}
@@ -453,9 +454,22 @@ Any peer that is not a short peer becomes a long peer, with no upper bound on th
 \subsection{DHTs in a Hyperbolic Topology}
 	
 \label{sec:hyper}
-	
+
+We have already shown with Kademlia that UrDHT can operate in a non-Euclidean geometry.
+Another non-euclidean geometry UrDHT can work in is a hyperbolic geometry.
+
+We implemented a DHT within a hyperbolic geometry using a Poincar\`{e} disc model.
+
+For 2 given points $a$ and $b$ in a Euclidean vector space, the \texttt{distance} in the  Poincar\`{e} disc is:
 
 
+\[ distance(a, b) = \operatorname{arcosh} \left(  1+ 2 \frac{ \left\| a - b \right\| ^{2} }{ ( 1 - \left\| a \right\| ^{2} ) ( 1 - \left\| b \right\| ^{2} ) }\right) \]
+
+
+However, the solving for the midpoint in the Poincar\`{e} disc model was nontrivial.
+We got around this by transforming the points from the Poincar\'{e} disc to a Beltrami-Klein model
+
+Now that we have a \texttt{distance} and \texttt{midpoint}, DGVH can generate a Delaunay Triangulation for the space.
 
 
 \subsubsection{Okay, this is interesting, but why bother?}
@@ -474,40 +488,39 @@ For example, handling geographic coordinates.
 We use simulations to test our implementations of DHTs using UrDHT.
 Using simulations to test the correctness and relative performance of DHTs is standard practice for testing and analyzing DHTs \cite{kademlia} \cite{chord} \cite{tapestry} \cite{symphony} \cite{raynet} \cite{li2005comparing}.
 
-
 Our experiments demonstrate that topologies implemented using UrDHT converge to a routable mesh.
 We demonstrate that lookup operations in these meshes can be done in sublinear time.
+Essentially each piece of hardware acts as multiple nodes, with each node running a webserver on top of it.
 
 
-Essentially each piece of hardware runs multiple nodes
+
+\subsection{UrKademlia Works}
+
+\subsection{Performance of Chord on our network module vs UrChord}
 
 \subsection{UrDHT Cohesion Euclidean Space}
-This experiment greatly resembles the one we performed when evaluating DGVH.
-
-
-
+This experiment greatly resembles the one we performed when evaluating DGVH \cite{dgvh}.
 
 \subsection{Cohesion in hyperbolic space}
 We showed in worked in DGVH, it should work in a hyperbolic space.
 
 
-\subsection{Performance of Chord on our network module vs UrChord}
 
 
-\subsection{UrKademlia Works}
 
 
 \section{Future Work and Conclusions}
 \label{sec:future}
 
 %Restate the intro
-UrDHT 
+UrDHT is a unified model for DHTs and framework for building distributed applications.
+
 
 
 %Future stuff
-There are numerous routes 
+There are numerous routes we can take with our model.
+Of particular interest are the applications of builind a DHT overlay that operates in a hyperbolic geometry.
 
-Creating a DHT overlay that operates in a hyperbolic geometry
 One of the other features shared by nearly every DHT is that routing works by minimizing the number of hops across the overlay network, with all hops treated as the same length.
 This is done because it is assumed that DHTs know nothing about the state of actual infrastructure the overlay is built upon.
 
@@ -528,7 +541,7 @@ Nodes would respond to changes in latency and the network by rejoining the netwo
 
 
 
-Hyperbolic spaces allow us to cleanly embed scale free graphs
+%Hyperbolic spaces allow us to cleanly embed scale free graphs
 
 \bibliography{mine,dht,voronoi}
 \bibliographystyle{IEEEtran}
