@@ -80,11 +80,12 @@ UrDHT directly builds its topology using this insight.
 It uses a greedy distributed heuristic for approximating Delaunay triangulations.
 UrDHT is our specification of an abstract DHT, which can be used to build many different DHTs.
 We found that we could reproduce the topology of different DHTs by defining a selection heuristic and rejection algorithm for the space.
-For every DHT we tried, our greedy approximation of Delaunay Triangulation using a distance and midpoint function for the space produced a stable DHT.  
+For every DHT we tried, our greedy approximation of Delaunay Triangulation %using a distance and midpoint function 
+for the space produced a stable DHT.  
 This works in non-Euclidean spaces such as XOR (Kademlia)  or even a hyperbolic space represented by a Poincar\`{e} disc.
 
 The end result is not only do we have an abstract model of DHTs, we have a simple framework that developers can use to quickly create new distributed applications.
-This simple framework allows generation of internally consistent implementations of different DHTs that can have their performance rigorously compared.  %IE we can now test DHTs against each other fairly
+This simple framework allows generation of internally consistent implementations of different DHTs that can have their performance rigorously compared.  %we can now test DHTs against each other fairly
 
 
 
@@ -114,7 +115,8 @@ To summarize our contributions:
 	
 	\item We present UrDHT as an abstract DHT and show how a developer can tweak the functions we defined to create an arbitrary new DHT topology (Section \ref{sec:urdht}).
 	\item We show how to reproduce the topology of Chord and Kademlia using UrDHT, which we call UrChord and UrKademlia.
-	We also implement a DHT in a hyperbolic  space represented  by a Poincar\`{e} disc (Section \ref{sec:implement}).
+	We also implement a DHT in a hyperbolic  space represented  by a Poincar\`{e} disc.
+	We also discuss how we can  UrDHT can run subnetworks as a service (Section \ref{sec:implement}).
 	%\item We show how we can embed latency into the overlay of a DHT by placing the DHT into and defining the necessary methods so that DGVH can run in that space  (Section \ref{sec:hyper}).
 	
 	\item We conduct experiments showing that UrChord sufficiently approximates a correct implementation of Chord (Section \ref{sec:experiments}). 
@@ -304,20 +306,25 @@ We discuss each in further detail below.
 \subsection{The DHT Protocol }
 \label{sec:protocol}
 
-The DHT Protocol (\texttt{LogicClass.py}) is the shared functionality between every single DHT.
+The DHT Protocol (\texttt{LogicClass.py}) \cite{urdht} is the shared functionality between every single DHT.
 It consists of the node's information, the short peer list to define the overlay, the long peers that make efficient routing possible, and all the functions that use them.
 There is no need for a developer to change anything in the DHT Protocol, but it can be modified if so desired.
 The DHT Protocol depends on functions from Space Math in order to perform operations within the specified space.
 
 
+Many of the function calls should be familiar to anyone who has study DHTs.
+We will discuss the a few new functions we added and the onces that contribute to node maintenance.
 
-In our efforts to further abstract DHTs, we have implemented \texttt{lookup} using the function \texttt{seek}.
+The first thing we note is the absence of \texttt{lookup}.
+In our efforts to further abstract DHTs, we have replaced \texttt{lookup} using the function \texttt{seek}.
 The \texttt{seek} function acts a single step of \texttt{lookup}.
 It returns the closest node to $ key $ that the node knows about.
-Nodes perform \texttt{lookup} by iteratively calling \texttt{seek} until it receives the same answer twice.
+Nodes can perform \texttt{lookup} by iteratively calling \texttt{seek} until it receives the same answer twice.
 
 
-The \texttt{join} operation takes in a set of bootstrap nodes, called $ candidates $.
+The \texttt{join} operation takes in a set of bootstrap nodes, called $ candidates $, rather than a single node.
+This is part of are assumptions about how UrDHT can be used as a bootstrap network by providing bootstrapping information for a particular network.
+
 The joining node randomly selects one of these $ candidates $ and finds the ``parent'' node currently responsible for the space.
 The joining node then populates its short peers using the ``parent'' node's short peers.
 The node  uses the parent to populate its short peer list and then makes it aware of its existence using \texttt{notify}.
@@ -327,7 +334,7 @@ Once that has been finished, the joining node starts its maintenance thread.
 
 %TODO check truth
 Maintenance is done via gossip.
-Each maintenance cycle, the node recalculates its Delaunay (short) peers using its neighbor's peer list and any nodes that have notified it since the last maintance cycle.
+Each maintenance cycle, the node recalculates its Delaunay (short) peers using its neighbor's peer list and any nodes that have notified it since the last maintenance cycle.
 This is done using DGVH by default, but could be done with some other algorithm.
 Once those are calculated, the node handles modifying it's long peers, as dictated by the \texttt{handleLongPeers} function described in Section \ref{sec:space}.
 
@@ -439,10 +446,10 @@ Euclidean space was the default space we used when building UrDHT.
 \subsection{ZHT}
 ZHT \cite{li2013zht} leads to an extremely trivial implementation in UrDHT.
 Unlike other DHTs, ZHT assumes an extremely low rate of churn.
-As a result, the topology of ZHT is a clique, with each node having an edge to all other nodes, yielding $ O(1) $ lookup times.
+As a result, the topology of ZHT is a clique, with each node having an edge to all other nodes, yielding $ O(1) $ lookup times with an $ O(n) $ memory cost.
 
 The only change that needs to be made is to \texttt{handleLongPeers}.
-We just place no upper bound on the size of the list of Long Peers.
+Any peer that is not a short peer becomes a long peer, with no upper bound on the size of the long peer list.
 \subsection{DHTs in a Hyperbolic Topology}
 	
 \label{sec:hyper}
@@ -464,15 +471,19 @@ For example, handling geographic coordinates.
 \section{Experiments}
 \label{sec:experiments}
 
-We use simulations to test our DHTs.
-Using simulations to test the correctness and relative performance of DHTs is standard practice in both whitepapers and applications
-Citations are all major DHTs
-Citations for analysis works that use simulations
-Citations for applications of DHTs that were peer reviewed and accepted using simulations
+We use simulations to test our implementations of DHTs using UrDHT.
+Using simulations to test the correctness and relative performance of DHTs is standard practice for testing and analyzing DHTs \cite{kademlia} \cite{chord} \cite{tapestry} \cite{symphony} \cite{raynet} \cite{li2005comparing}.
 
-What are our experiments?
+
+Our experiments demonstrate that topologies implemented using UrDHT converge to a routable mesh.
+We demonstrate that lookup operations in these meshes can be done in sublinear time.
+
+
+Essentially each piece of hardware runs multiple nodes
 
 \subsection{UrDHT Cohesion Euclidean Space}
+This experiment greatly resembles the one we performed when evaluating DGVH.
+
 
 
 
@@ -520,6 +531,6 @@ Nodes would respond to changes in latency and the network by rejoining the netwo
 Hyperbolic spaces allow us to cleanly embed scale free graphs
 
 \bibliography{mine,dht,voronoi}
-\bibliographystyle{plain}
+\bibliographystyle{IEEEtran}
 
 \end{document}
