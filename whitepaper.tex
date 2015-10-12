@@ -134,42 +134,27 @@ Nodes and data in a DHT are assigned unique\footnote{Unique with astronomically 
 To make it easier to grok the context, we will call the key associated with a node its ID and refer to nodes and their IDs interchangeably.
 
 A DHT can perform the \texttt{lookup(key)}, \texttt{get(key)}, and \texttt{store(key, value)} operations.\footnote{There is typically a \textit{delete(key)} operation defined too, but it is not strictly necessary.}
-The \texttt{lookup} operation returns the node responsible for a queried key. .
+The \texttt{lookup} operation returns the node responsible for a queried key.
 The \texttt{store} function stores that key/value pair in the DHT, while \texttt{get} returns the value associated with that key.
 
 However, this is what a DHT \textit{does}, viewing the DHT as a black box, not what a DHT \textit{is} and needs to be implemented.
 We show that Distributed Hash Tables are just Voronoi tessellations and Delaunay triangulation.
 
-%\subsection{DHTs, Delaunay Triangulation, and Voronoi Tesselation}
-%
-%In order to perform maintain a distributed
+\subsection{DHTs, Delaunay Triangulation, and Voronoi Tesselation}
+
+Nodes in different DHTs have, what appears at the first glance, wildly disparate ways of keeping track of peers, the other nodes in the network.
+However, peers can be split into two groups.
+
+The first group is the \textit{short peers}.
+These are the closest peers to the node and, as such, define the range of keys the node is responsible for. 
+A node is responsible for a key if and only if its ID is closest to the given key in the geometry of the DHTs.
+Short peers define the DHTs topology and guarantee that the greedy routing algorithm shared by all DHTs works.
 
 
-\subsection{DHT Components}
-The following functions need to be defined in order for nodes to perform lookup operations and determine responsibility.
+All other peers comprise the \textit{long peers}.
+Long peers are the nodes that allow a DHT to achieve sublinear routing speeds, typically $ \log(n) $ hops.
 
-%TODO Which of theses are the discrimination metric
-\begin{itemize}
-	\item \textbf{A \texttt{distance} function } - This measures distance in the overlay formed by the Distributed Hash Table.
-	In most DHTs, the distance in the overlay has no correlation with real-world attributes.
-	
-	\item \textbf{A \texttt{midpoint} function} - This calculates the minimally equidistant point between two given point.
-	The midpoint is required for Delaunay triangulation calculation.
-	In some spaces, such as Kademlia's XOR metric space, this can be tricky to calculate.  % Is this part of ownership?
-	\item \textbf{An \texttt{responsibility} definition}  This defines the range of keys a node is responsible for. 
-	Not every DHT defines which node is responsible for particular keys in the same way. 
-	For example, nodes in Kademlia are responsible for the keys closest to themselves, while in Chord, nodes are responsible for the keys falling between themselves and the preceding node.
-\end{itemize}
-
-
-
-
-A DHT also needs a strategy to organize and maintain two lists of of other nodes in the network: \textit{short peers} and \textit{long peers}.
-Short peers are the set of peers that define the topology of the network and guarantee that greedy routing works.
-
-Long peers allow the DHT to achieve a better than linear lookup time, typically $ \log(n) $, where $n$ is the size of the network. 
-
-Interestingly, despite the diversity of DHT topologies, all DHTs use functionally identical greedy routing algorithms (Algorithm \ref{alg:routing}):
+Interestingly, despite the diversity of DHT topologies and how each DHT organizes short and long peers,  all DHTs use functionally identical greedy routing algorithms (Algorithm \ref{alg:routing}):
 
 \begin{algorithm}
 	\caption{The DHT Generic Routing algorithm}
@@ -179,10 +164,10 @@ Interestingly, despite the diversity of DHT topologies, all DHTs use functionall
 		\STATE Given node $n$ and a message being sent to $key$
 		\STATE \textbf{function} $n.$\texttt{lookup}$(key)$
 		\IF{If $key \in n$'s range of responsibility}
-			\RETURN $ n $
+		\RETURN $ n $
 		\ENDIF
 		\IF{ One of $n$'s short peers are responsible for $key$}
-			\RETURN the responsible node
+		\RETURN the responsible node
 		\ENDIF
 		\STATE $ candidates $ = $ short\_peers $ + $ long\_peers $
 		\STATE $ next  \leftarrow $  $\min (n$.distance($candidates$, $ key ))$
@@ -191,6 +176,7 @@ Interestingly, despite the diversity of DHT topologies, all DHTs use functionall
 	
 	\scriptsize
 \end{algorithm}
+The algorithm is as follows:
 If I, the node, am responsible for the key, I return myself.
 Otherwise, if I know who is responsible for this key, I return that node.
 Finally, if that is not the case, I forward this query to the node I know with shortest distance from the node to the desired key.\footnote{This order matters, as some DHTs such as Chord are unidirectional.} 
@@ -200,28 +186,49 @@ It will certainly have differences in how a node handles errors, such as how to 
 This algorithm may possibly be  run in parallel, such as in Kademlia \cite{kademlia}.
 Despite this, the base greedy algorithm is always the same between implementations.
 
-The final component is a consistent hashing function.
-This function must generate keys large enough to make the chances of a hash collision nigh impossible.
 
 
+With the components of a DHT defined above we can now show the relationship between DHTs and the primal-dual problems of Delaunay Triangulation and Voronoi Tessellation.
 
-\subsection{DHTs, Delaunay Triangulation, and Voronoi Tesselation}
-With the following components of a DHT defined above we can now show the relationship between DHTs and the primal-dual problems of Delaunay Triangulation and Voronoi Tessellation.
+We can map a given node's ID to a point in a space and the set of short peers to the Delaunay triangulation.
+This would make the range of keys a node is responsible correspond to the node's Voronoi region.
+Long peers serve as shortcuts across the mesh formed by Delaunay triangulations.
 
-We can map a given node's ID to a point in a space, the range of keys a node is responsible for to that node's Voronoi region, and the set of short peers to the Delaunay triangulation.
+
 Thus, if we can calculate the Delaunay triangulation between nodes in a DHT, we have a generalized means of created the overlay network.
-
 This can be done with any algorithm that calculates the Delaunay Triangulation.
+
 Computing the Delaunay Triangulation and/or the Voronoi Tesselation of a set of points is a well analyzed problem.
 Many algorithms exist which efficiently compute a Voronoi tessellation for a given set of points on a plane, such as Fortune's sweep line algorithm \cite{fortune1987sweepline}.
-However, many DHTs are distributed and many of the algorithms to compute Delaunay Triangulation and/or Delaunay Triangulation are unsuited to a distributed environment.
 
+However, many DHTs are distributed and many of the algorithms to compute Delaunay Triangulation and/or Delaunay Triangulation are unsuited to a distributed environment.
 In addition, the computation cost increases when we move into spaces with greater than two dimensions.
 In general, finding the Delaunay Triangulation of $n$ points in a space with $d$ dimensions takes $O(n^{\frac{2d-1}{d}})$ time \cite{watson1981computing}.
 
 
 Is there an algorithm we can use to efficiently calculate Delaunay Triangulations for a distributed system in an arbitrary space?
-We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH), shown in Algorithm \ref{alg:dgvh} and explained below \cite{dgvh}.
+We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH), explained below \cite{dgvh}.
+
+
+\subsection{Distributed Greedy Voronoi Heuristic}
+\label{sec:dgvh}
+
+
+The Distributed Greedy Voronoi Heuristic (DGVH) is an method for nodes to define their individual Voronoi region (Algorithm \ref{alg:dgvh}). 
+DVGH selects nearby nodes that would correspond to points connected to it within a Delaunay triangulation.
+Our heuristic is based on the rationale that, in the majority of cases, the midpoint of two nodes falls on the boundary of their Voronoi regions.
+
+The heuristic is described in Algorithm \ref{alg:dgvh}.
+Every maintenance cycle, nodes exchange their peer lists with their neighbors.
+A node creates a list of candidates by combining their peer list with their neighbor's peer list.\footnote{In our previous paper, nodes exchange peer lists with a single peer. Calls to DGVH in this paper use all the }
+This list of peers is then sorted from closest to furthest distance.
+The node then initializes a new peer list with the closest candidate.
+For each of the remaining candidates, the node calculates the midpoint between itself and the candidate.
+If new peer list does not contain any nodes closer to the midpoint than the candidate, the candidate is added to the new peer list.
+Otherwise, the candidate is set aside.
+
+The resulting short peers are a subset of the node's actual Delaunay neighbors.
+A crucial feature is that this subset guarantees that DGVH will form a routable mesh.
 
 
 \begin{algorithm} % make smaller
@@ -256,39 +263,42 @@ We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH), sh
 		%\ENDIF
 	\end{algorithmic}
 \end{algorithm} 
-%TODO short or all peers
-
-
-A node takes a set of peers and uses DGVH to determine which of these correspond to Delaunay peers.
-From the perspective of the node, the candidates are the only nodes that exist.
-The resulting short peers are a subset of the node's actual Delaunay neighbors.
-A crucial feature is that this subset guarantees that DGVH will form a routable mesh.
-
-
-%TODO Reconcile with previous paper
-DGVH uses the midpoint to gauge which other nodes to use as its Delaunay triangulation \cite{dgvh}.
-Every maintenance cycle, nodes exchange their peer lists with their neighbors.
-A node creates a list of candidates by combining their peer list with their neighbor's peer list. \footnote{In our previous paper, nodes exchange peer lists with a single peer. Calls to DGVH in this paper use all the }
-This list of peers is then sorted from closest to furthest distance.
-The node then initializes a new peer list with the closest candidate.
-For each of the remaining candidates, the node calculates the midpoint between itself and the candidate.
-If new peer list does not contain any nodes closer to the midpoint than the candidate, the candidate is added to the new peer list.
-Otherwise, the candidate is set aside.
-How long peers are handled depends on the particular DHT implementation.
 
 
 Candidates are gathered via a gossip protocol as well as notifications from close peers.
+How long peers are handled depends on the particular DHT implementation.
 This process is described more in Section \ref{sec:protocol}.
 
-The expected maximum size of $ candidates $ corresponds to the expected maximum degree of a vertex.
-For a Delaunay Triangulation in any number of dimensions is $\Theta(\frac{\log n}{\log \log n} )$ \cite{bern1991expected}. 
+The expected maximum size of $ candidates $ corresponds to the expected maximum degree of a vertex in a Delaunay Triangulation.
+This is  $\Theta(\frac{\log n}{\log \log n} )$, regardless of the number of the dimensions \cite{bern1991expected}. 
 We can therefore expect \textit{short peers} to be bounded by $\Theta(\frac{\log n}{\log \log n})$.
 
-The expected worst case cost of \(O(\frac{\log^{4} n}{\log^{4} \log n} )\) \cite{dgvh}, regardless of the dimension \cite{dgvh}. \footnote{As mentioned in the previous footnote, if we are exchanging peers with a single neighbor rather than all our neighbors, the cost lowers to \(O(\frac{\log^{2} n}{\log^{2} \log n} )\).}
+This makes the expected worst case cost of DGVH \(O(\frac{\log^{4} n}{\log^{4} \log n} )\) \cite{dgvh}, regardless of the dimension \cite{dgvh}. \footnote{As mentioned in the previous footnote, if we are exchanging peers with a single neighbor rather than all our neighbors, the cost lowers to \(O(\frac{\log^{2} n}{\log^{2} \log n} )\).}
 It most cases, this cost much lower, on the order of is $ O(dk\log(k) + k^{2} ) $ for $ d $ dimensions and $ k $ candidates.
+Additional details can be found in our previous work \cite{dgvh}
+
+
+
 
 We have tested DGVH on Chord (a ring-based topology), Kademlia (a XOR-based tree topology), general Euclidean spaces, and even in a hyperbolic geometry.
 We show in Section \ref{sec:experiments} that DGVH works in all of these spaces.
+DGVH only needs the followoing functions to be defined in order for nodes to perform lookup operations and determine responsibility.
+
+%TODO Which of theses are the discrimination metric
+\begin{itemize}
+	\item \textbf{A \texttt{distance} function } - This measures distance in the overlay formed by the Distributed Hash Table.
+	In most DHTs, the distance in the overlay has no correlation with real-world attributes.
+	
+	\item \textbf{A \texttt{midpoint} function} - This calculates the minimally equidistant point between two given point.
+	The midpoint is required for Delaunay triangulation calculation.
+	In some spaces, such as Kademlia's XOR metric space, this can be tricky to calculate.  % Is this part of ownership?
+	\item \textbf{An \texttt{responsibility} definition}  This defines the range of keys a node is responsible for. 
+	Not every DHT defines which node is responsible for particular keys in the same way. 
+	For example, nodes in Kademlia are responsible for the keys closest to themselves, while in Chord, nodes are responsible for the keys falling between themselves and the preceding node.
+\end{itemize}
+
+We will now show how we used this information and algorithms to create UrDHT, our abstract model for  distributed hash tables.
+
 
 
 
