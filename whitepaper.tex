@@ -272,7 +272,7 @@ The expected maximum size of $ candidates $ corresponds to the expected maximum 
 This is  $\Theta(\frac{\log n}{\log \log n} )$, regardless of the number of the dimensions \cite{bern1991expected}. 
 We can therefore expect \textit{short peers} to be bounded by $\Theta(\frac{\log n}{\log \log n})$.
 
-This makes the expected worst case cost of DGVH \(O(\frac{\log^{4} n}{\log^{4} \log n} )\) \cite{dgvh}, regardless of the dimension \cite{dgvh}. \footnote{As mentioned in the previous footnote, if we are exchanging peers with a single neighbor rather than all our neighbors, the cost lowers to \(O(\frac{\log^{2} n}{\log^{2} \log n} )\).}
+This makes the expected worst case cost of DGVH \(O(\frac{\log^{4} n}{\log^{4} \log n} )\) \cite{dgvh}, regardless of the dimension \cite{dgvh}.\footnote{As mentioned in the previous footnote, if we are exchanging peers with a single neighbor rather than all our neighbors, the cost lowers to \(O(\frac{\log^{2} n}{\log^{2} \log n} )\).}
 It most cases, this cost much lower, on the order of is $ O(dk\log(k) + k^{2} ) $ for $ d $ dimensions and $ k $ candidates.
 Additional details can be found in our previous work \cite{dgvh}
 
@@ -502,7 +502,11 @@ For example, handling geographic coordinates.
 
 
 \subsection{Services}
-\texttt{put}  \texttt{poll}
+
+There needs to be an easy way to append data to the bootstrapping list.
+
+To do this, we introduce the \texttt{put} and  \texttt{poll} primitives.
+These functions can considered abstracted versions.
 	
 \section{Experiments}
 \label{sec:experiments}
