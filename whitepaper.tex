@@ -236,12 +236,12 @@ A crucial feature is that this subset guarantees that DGVH will form a routable 
 	\caption{Distributed Greedy Voronoi Heuristic}
 	\label{alg:dgvh}
 %	\algsetup{linenosize=\tiny}
-%	\scriptsize
+	\small
 	\begin{algorithmic}[1]  % the numberis how many lines
 		\State Given node $n$ and its list of $candidates$.
 		\State Given the minimum $table\_size$
-		\State $short\_peers \leftarrow$ empty set that will contain $n$'s one-hop peers
-		\State $long\_peers \leftarrow$ empty set that will contain $n$'s peers further than one hop.
+		\State $short\_peers \leftarrow$ empty set% that will contain $n$'s one-hop peers
+		\State $long\_peers \leftarrow$ empty set %that will contain $n$'s peers further than one hop.
 		\State Sort $candidates$ in ascending order by each node's \texttt{distance} to $n$
 		\State Remove the first member of $candidates$ and add it to $short\_peers$
 		\ForAll {$c$ in $candidates$}
