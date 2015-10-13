@@ -11,7 +11,7 @@
 \usepackage{subcaption}
 %\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
 \usepackage{algorithm} 
-\usepackage{algorithmic}
+\usepackage{algpseudocode}
 \usepackage[font=small]{caption}
 
 \title{UrDHT: A Unified Model for Distributed Hash Tables}
@@ -158,19 +158,21 @@ Interestingly, despite the diversity of DHT topologies and how each DHT organize
 \begin{algorithm}
 	\caption{The DHT Generic Routing algorithm}
 	\label{alg:routing}
-	\algsetup{linenosize=\tiny}
+	%\algsetup{linenosize=\tiny}
+	\small
 	\begin{algorithmic}[1]
-		\STATE Given node $n$ and a message being sent to $key$
-		\STATE \textbf{function} $n.$\texttt{lookup}$(key)$
-		\IF{If $key \in n$'s range of responsibility}
-		\RETURN $ n $
-		\ENDIF
-		\IF{ One of $n$'s short peers are responsible for $key$}
-		\RETURN the responsible node
-		\ENDIF
-		\STATE $ candidates $ = $ short\_peers $ + $ long\_peers $
-		\STATE $ next  \leftarrow $  $\min (n$.distance($candidates$, $ key ))$
-		\RETURN $next.$lookup($key$)
+%		\State Given node $n$ and a message being sent to $key$
+		\Function{ $n.$lookup}{$(key)$}
+			\If{$key \in n$'s range of responsibility}
+				\State \Return $ n $
+			\EndIf
+			\If{ One of $n$'s short peers is responsible for $key$}
+				\State \Return the responsible node
+			\EndIf
+			\State $ candidates $ = $ short\_peers $ + $ long\_peers $
+			\State $ next  \leftarrow $  $\min (n$.distance($candidates$, $ key ))$
+			\State \Return $next.$lookup($key$)
+		\EndFunction
 	\end{algorithmic}
 	
 	\scriptsize
@@ -233,32 +235,32 @@ A crucial feature is that this subset guarantees that DGVH will form a routable 
 \begin{algorithm} % make smaller
 	\caption{Distributed Greedy Voronoi Heuristic}
 	\label{alg:dgvh}
-	\algsetup{linenosize=\tiny}
-	%\scriptsize
+%	\algsetup{linenosize=\tiny}
+%	\scriptsize
 	\begin{algorithmic}[1]  % the numberis how many lines
-		\STATE Given node $n$ and its list of $candidates$.
-		\STATE Given the minimum $table\_size$
-		\STATE $short\_peers \leftarrow$ empty set that will contain $n$'s one-hop peers
-		\STATE $long\_peers \leftarrow$ empty set that will contain $n$'s peers further than one hop.
-		\STATE Sort $candidates$ in ascending order by each node's \texttt{distance} to $n$
-		\STATE Remove the first member of $candidates$ and add it to $short\_peers$
-		\FORALL{$c$ in $candidates$}
-			\STATE $m$ $ \leftarrow $ \texttt{midpoint}$( n, c )$
-			\IF{any node in $short\_peers$ is closer to $m$ than $n$}
-				\STATE Reject $c$ as a peer
-			\ELSE
-				\STATE Remove $c$ from $candidates$
-				\STATE Add $c$ to $short\_peers$
-			\ENDIF
-		\ENDFOR
-		\WHILE{$|short\_peers| < table\_size$ \AND $|candidates| >0$}
-			\STATE Remove the first entry $c$ from $candidates$
-			\STATE Add $c$ to $short\_peers$
-		\ENDWHILE
-		\STATE Add $candidates$ to the set of $long\_peers$	
-		\STATE \texttt{handleLongPeers}($long\_peers$)
+		\State Given node $n$ and its list of $candidates$.
+		\State Given the minimum $table\_size$
+		\State $short\_peers \leftarrow$ empty set that will contain $n$'s one-hop peers
+		\State $long\_peers \leftarrow$ empty set that will contain $n$'s peers further than one hop.
+		\State Sort $candidates$ in ascending order by each node's \texttt{distance} to $n$
+		\State Remove the first member of $candidates$ and add it to $short\_peers$
+		\ForAll {$c$ in $candidates$}
+			\State $m$ $ \leftarrow $ \texttt{midpoint}$( n, c )$
+			\If{any node in $short\_peers$ is closer to $m$ than $n$}
+				\State Reject $c$ as a peer
+			\Else
+				\State Remove $c$ from $candidates$
+				\State Add $c$ to $short\_peers$
+			\EndIf
+		\EndFor
+		\While{$|short\_peers| < table\_size $ and $ |candidates| >0$}
+			\State Remove the first entry $c$ from $candidates$
+			\State Add $c$ to $short\_peers$
+		\EndWhile
+		\State Add $candidates$ to the set of $long\_peers$	
+		\State \texttt{handleLongPeers}($long\_peers$)
 		%\IF{$|long\_peers| > table\_size^2$}
-		%	\STATE $long\_peers \leftarrow$ random subset of $long\_peers$ of size $table\_size^2$
+		%	\State $long\_peers \leftarrow$ random subset of $long\_peers$ of size $table\_size^2$
 		%\ENDIF
 	\end{algorithmic}
 \end{algorithm} 
