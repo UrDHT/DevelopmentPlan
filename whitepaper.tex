@@ -444,28 +444,40 @@ In some case it may more convenient implement \texttt{handleLongPeers} as part o
 \label{sec:implement}
 \subsection{Implementing Chord and Ring-Based Topology}
 
-Ring topologies are fairly straightforward since they act as are one dimensional Voronoi Tesselations, splitting up what is effectively a modular number line among multiple nodes.
+Ring topologies are fairly straightforward since they act as are one dimensional Voronoi tessellations, splitting up what is effectively a modular number line among multiple nodes.
+
+Chord can be run using a 
 
 
 
+For a ring based DHTs.
 %We know Chord's invariants are not (citation), but our protocol isn't affected by these constraints
 
 
 \subsection{Implementing Kademlia and Other Tree Based Topologies}
-The largest complication in implementing UrKademlia is defining the exclusive or, or XOR, metric which is used for distance.
-This metric, while non-euclidean, is perfectly acceptable for calculating distance in Kademlia \cite{kademlia}
+The largest complication in implementing Kademlia is the exclusive or, or XOR, metric which is used for distance.
+This metric, while non-euclidean, is perfectly acceptable for calculating distance in Kademlia \cite{kademlia}.
 However, XOR does not have an intuitive midpoint we could use for DGVH.
 
 To solve this, we used the XOR metric defined by Kademlia as the distance function and the midpoint function.
+For two given keys $ a $ and $ b $
 
-
+\[ disance(a, b) = midpoint(a, b) = a  \oplus b\]
 
 We then implemented handle long peers.
 
 \subsection{Implementing A DHT in an Arbitrary Euclidean Geometry}
 
-A Euclidean space was the default space we used when building UrDHT and DGVH \cite{dgvh}.
+We used a toroidal Euclidean geometry as the default space when building UrDHT and DGVH \cite{dgvh}.
+This uses the following \texttt{distance} and \texttt{midpoint} functions.
+For two vectors $\vec{a}$ and $\vec{b}$ in $d$ dimensions: 
 
+\[distance\left(\vec{a}, \vec{b}\right) = \sqrt{\sum\limits_{i\in d} \left(|\vec{a}_i-\vec{b}_i|\right)^2}\]
+\[midpoint\left(\vec{a}, \vec{b}\right) =  \left[\frac{(a_0, b_0)}{2},\frac{(a_1, b_1)}{2}, ... ,\frac{(a_d, b_d)}{2} \right] \]
+
+We use DGVH as normal and set the minimum number of short peers to $3d+1$, a value we found through experiments \cite{dgvh}.
+Long peers are randomly selected from the left-over candidates after DGVH is performed \cite{dgvh}.
+The maximum size of long peers is set to $(3d+1)^2$, but it can be lowered or eliminated if desired and maintain $ O(\sqrt[d]{n}) $ routing time.
 
 
 \subsection{ZHT}
@@ -520,14 +532,29 @@ Our experiments demonstrate that topologies implemented using UrDHT converge to 
 We demonstrate that lookup operations in these meshes can be done in sublinear time.
 Essentially each piece of hardware acts as multiple nodes, with each node running a webserver on top of it.
 
+Tests
+In time over a randomly populated network
+Iterative joins, start with one node
+
+parameters
+Network diameter
+greedy routing distance 
+greedy routing success rate 
+numbers of peers
 
 
-\subsection{UrKademlia Works}
+\subsection{Kademlia Works}
+B
 
-\subsection{Performance of Chord on our network module vs UrChord}
+
+\subsection{Performance of Chord on our network module}
+
+
 
 \subsection{UrDHT Cohesion Euclidean Space}
 This experiment greatly resembles the one we performed when evaluating DGVH \cite{dgvh}.
+
+We've previously shown that higher degrees work \cite{dgvh}.
 
 \subsection{Cohesion in hyperbolic space}
 We showed in worked in DGVH, it should work in a hyperbolic space.
