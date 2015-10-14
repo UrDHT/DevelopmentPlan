@@ -350,7 +350,7 @@ Once that has been finished, the joining node starts its maintenance thread.
 Maintenance is done via gossip.
 Each maintenance cycle, the node recalculates its Delaunay (short) peers using its neighbor's peer list and any nodes that have notified it since the last maintenance cycle.
 This is done using DGVH by default, but could be done with some other algorithm.
-Once those are calculated, the node handles modifying it's long peers, as dictated by the \texttt{handleLongPeers} function described in Section \ref{sec:space}.
+Once those are calculated, the node handles modifying its long peers, as dictated by the \texttt{handleLongPeers} function described in Section \ref{sec:space}.
 
 \subsection{The Space Math}
 \label{sec:space}
@@ -398,7 +398,7 @@ def getDelaunayPeers(candidates,center):
 	for c in sortedCandidates:
 		accept = True
 		for p in peers:
-			if distance(c, p) < distance(c, center):  
+			if distance(c,p) < distance(c,center):
 				accept = False
 				break
 		if accept:
@@ -410,12 +410,12 @@ def getDelaunayPeers(candidates,center):
 %\subsubsection{Handle Long Peers}
 
 \item The final function is \texttt{handleLongPeers}.
-\texttt{handleLongPeers} takes in a $ candidates $ and a $ center$, much like \texttt{getDelaunayPeers}, and returns .
+\texttt{handleLongPeers} takes in a list of $ candidates $ and a $ center$, much like \texttt{getDelaunayPeers}, and returns  a set of peers to act as routing shortcuts.
 %TODO it actually raises the question, how should it work?  Since we shouldn't recalculate long peers from scratch every time.
 
 The implementation of this function should vary greatly from one DHT to another.
 For example, long peers in Symphony \cite{symphony} and other small-world \cite{kleinberg2000navigation} networks choose long peers using a probability distribution.
-Chord has a much more structured distribution, with each long peer being an increasing power of 2 distance away from the node \cite{chord}.
+Chord has a much more structured distribution, with each long peer being increasing powers of 2 distance away from the node \cite{chord}.
 
 
 
@@ -495,7 +495,7 @@ For any two given points $a$ and $b$ in a Euclidean vector space, the \texttt{di
 Now that we have a \texttt{distance} , DGVH can generate a Delaunay Triangulation for the space.
 
 
-\subsubsection{Okay, this is interesting, but why bother?}
+%\subsubsection{Okay, this is interesting, but why bother?}
 Because we it was difficult
 
 Because it shows that UrDHT and DGVH both work in arbitrary geometries.
@@ -551,7 +551,13 @@ We showed in worked in DGVH, it should work in a hyperbolic space.
 
 
 
+\subsection{Remarks}
+Our experiments show that Euclidean and Hyperbolic topologies offer a distinct advantage over Chord and Kademlia.
+Chord and Kademlia cannot create a organized network from an initially randomly connected graph.
+We had demonstrated here and in our previous works that Euclidean and Hyperbolic topologies like the ones 
 
+With an initial $k$-connected graph, the first step is for nodes to select short and long peers.
+Because Chord and Kademlia are highly selective in what they select in long peers, this first pass culling reduces the initially connected graph into multiple disjoint sets from which it cannot recover.
 
 \section{Future Work and Conclusions}
 \label{sec:future}
@@ -571,7 +577,7 @@ This is done because it is assumed that DHTs know nothing about the state of act
 However, this means that most DHTs will happily route a message from one continent to another and back.
 This is obviously undesirable, but it is the status quo in DHTs.
 This stems from the generation of node IDs in DHTs. 
-Nodes are typically assigned a point in the range of a cryptographic hash funtion, called the keyspace. 
+Nodes are typically assigned a point in the range of a cryptographic hash function. 
 This ID corresponds to the hash of some identifier or given a point randomly.
 This is done for purposes of load balancing and fault tolerance.
 
