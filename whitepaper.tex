@@ -152,6 +152,7 @@ Short peers define the DHTs topology and guarantee that the greedy routing algor
 
 All other peers comprise the \textit{long peers}.
 Long peers are the nodes that allow a DHT to achieve sublinear routing speeds, typically $ \log(n) $ hops.
+A DHT can still function without long peers.
 
 Interestingly, despite the diversity of DHT topologies and how each DHT organizes short and long peers,  all DHTs use functionally identical greedy routing algorithms (Algorithm \ref{alg:routing}):
 
@@ -394,7 +395,7 @@ in Listing \ref{lst:dgvh}
 
 %TODO  I don't see any minimums here
 
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily,  breaklines=true, caption={\texttt{getDelaunayPeers()}}, label={lst:dgvh}, frame=single] 
+\begin{lstlisting}[basicstyle=\scriptsize\ttfamily,  breaklines=true, caption={\texttt{getDelaunayPeers()}}, label={lst:dgvh}, frame=single] 
 def getDelaunayPeers(candidates,center):    
 	if len(candidates) < 2:
 		return candidates
@@ -402,10 +403,9 @@ def getDelaunayPeers(candidates,center):
 	peers = [sortedCandidates[0]] 
 	sortedCandidates = sortedCandidates[1:]
 	for c in sortedCandidates:
-		m = midpoint(c, center)
 		accept = True
 		for p in peers:
-			if distance(m,p) < distance(m, center):  
+			if distance(c, p) < distance(c, center):  
 				accept = False
 				break
 		if accept:
@@ -492,6 +492,9 @@ Any peer that is not a short peer becomes a long peer, with no upper bound on th
 We have already shown with Kademlia that UrDHT can operate in a non-Euclidean geometry.
 Another non-euclidean geometry UrDHT can work in is a hyperbolic geometry.
 
+\texttt{idToPoint} creates a random point from a uniform distribution.
+
+
 We implemented a DHT within a hyperbolic geometry using a Poincar\`{e} disc model.
 
 For 2 given points $a$ and $b$ in a Euclidean vector space, the \texttt{distance} in the  Poincar\`{e} disc is:
@@ -538,7 +541,9 @@ parameters
 Network diameter
 greedy routing distance 
 greedy routing success rate 
-numbers of peers
+maximum degree
+average degree
+
 
 
 \subsection{Kademlia Works}
