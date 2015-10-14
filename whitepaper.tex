@@ -217,10 +217,11 @@ We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH), ex
 
 The Distributed Greedy Voronoi Heuristic (DGVH) is an method for nodes to define their individual Voronoi region (Algorithm \ref{alg:dgvh}). 
 DVGH selects nearby nodes that would correspond to points connected to it within a Delaunay triangulation.
+Our previous implementation relied on a midpoint function, but we later found that it was uneeded.
 
 The heuristic is described in Algorithm \ref{alg:dgvh}.
 Every maintenance cycle, nodes exchange their peer lists with their short peers.
-A node creates a list of candidates by combining their peer lists with their neighbor's peer lists.\footnote{In our previous paper, nodes exchange peer lists with a single peer. Calls to DGVH in this paper use the information from all their short peers.}
+A node creates a list of candidates by combining their peer lists with their neighbor's peer lists.\footnote{In our previous paper, nodes exchange short peer lists with a single peer. Calls to DGVH in this paper use the information from all their short peers.}
 This list of peers is then sorted from closest to furthest distance.
 The node then initializes a new peer list with the closest candidate.
 For each of the remaining candidates, the node calculates compares the distance between the current short peers and the candidate.
@@ -565,7 +566,7 @@ Because Chord and Kademlia are highly selective in what they select in long peer
 %Restate the intro
 UrDHT is a unified model for DHTs and framework for building distributed applications.
 
-
+Future improvements of UrDHT would further disconnect long peers and short peers giving them their own implementation cycle.
 
 %Future stuff
 There are numerous routes we can take with our model.
