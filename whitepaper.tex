@@ -217,15 +217,14 @@ We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH), ex
 
 The Distributed Greedy Voronoi Heuristic (DGVH) is an method for nodes to define their individual Voronoi region (Algorithm \ref{alg:dgvh}). 
 DVGH selects nearby nodes that would correspond to points connected to it within a Delaunay triangulation.
-Our heuristic is based on the rationale that, in the majority of cases, the midpoint of two nodes falls on the boundary of their Voronoi regions.
 
 The heuristic is described in Algorithm \ref{alg:dgvh}.
-Every maintenance cycle, nodes exchange their peer lists with their neighbors.
-A node creates a list of candidates by combining their peer list with their neighbor's peer list.\footnote{In our previous paper, nodes exchange peer lists with a single peer. Calls to DGVH in this paper use all the }
+Every maintenance cycle, nodes exchange their peer lists with their short peers.
+A node creates a list of candidates by combining their peer lists with their neighbor's peer lists.\footnote{In our previous paper, nodes exchange peer lists with a single peer. Calls to DGVH in this paper use the information from all their short peers.}
 This list of peers is then sorted from closest to furthest distance.
 The node then initializes a new peer list with the closest candidate.
-For each of the remaining candidates, the node calculates the midpoint between itself and the candidate.
-If new peer list does not contain any nodes closer to the midpoint than the candidate, the candidate is added to the new peer list.
+For each of the remaining candidates, the node calculates compares the distance between the current short peers and the candidate.
+If new peer list does not contain any short  peers closer to the candidate than the node, the candidate is added to the new peer list.
 Otherwise, the candidate is set aside.
 
 The resulting short peers are a subset of the node's actual Delaunay neighbors.
@@ -245,8 +244,7 @@ A crucial feature is that this subset guarantees that DGVH will form a routable 
 		\State Sort $candidates$ in ascending order by each node's \texttt{distance} to $n$
 		\State Remove the first member of $candidates$ and add it to $short\_peers$
 		\ForAll {$c$ in $candidates$}
-			\State $m$ $ \leftarrow $ \texttt{midpoint}$( n, c )$
-			\If{any node in $short\_peers$ is closer to $m$ than $n$}
+			\If{any node in $short\_peers$ is closer to $c$ than $n$}
 				\State Reject $c$ as a peer
 			\Else
 				\State Remove $c$ from $candidates$
