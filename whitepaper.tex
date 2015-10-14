@@ -85,8 +85,7 @@ UrDHT directly builds its topology upon this insight.
 It uses a greedy distributed heuristic for approximating Delaunay Triangulations.
 UrDHT is our specification of an abstract DHT, which can be used to build many different DHTs.
 We found that we could reproduce the topology of different DHTs by defining a selection heuristic and rejection algorithm for the geometry the DHT operates within.
-For every DHT we tried, our greedy approximation of Delaunay Triangulation %using a distance and midpoint function 
-produced a stable DHT, regardless of the geometry the DHT existed within.  
+For every DHT we tried, our greedy approximation of Delaunay Triangulation produced a stable DHT, regardless of the geometry the DHT existed within.  
 This works in non-Euclidean geometries such as XOR (Kademlia) or even a hyperbolic geometry represented by a Poincar\`{e} disc.
 
 The end result is not only do we have an abstract model of DHTs, we have a simple framework that developers can use to quickly create new distributed applications.
@@ -289,9 +288,6 @@ DGVH only needs the followoing functions to be defined in order for nodes to per
 	\item \textbf{A \texttt{distance} function } - This measures distance in the overlay formed by the Distributed Hash Table.
 	In most DHTs, the distance in the overlay has no correlation with real-world attributes.
 	
-	\item \textbf{A \texttt{midpoint} function} - This calculates the minimally equidistant point between two given point.
-	The midpoint is required for Delaunay triangulation calculation.
-	In some spaces, such as Kademlia's XOR metric space, this can be tricky to calculate.  % Is this part of ownership?
 	\item \textbf{An \texttt{responsibility} definition}  This defines the range of keys a node is responsible for. 
 	Not every DHT defines which node is responsible for particular keys in the same way. 
 	For example, nodes in Kademlia are responsible for the keys closest to themselves, while in Chord, nodes are responsible for the keys falling between themselves and the preceding node.
@@ -378,9 +374,6 @@ This distinction matters since distance is not symmetric in every DHT.
 The prime example of this is Chord, which is a unidirectional toroidal ring.
 
 
-%\subsubsection{Midpoint}
-
-\item Similarly to \texttt{distance}, \texttt{midpoint} takes in the points $ a $ and $ b $ and returns the closest midpoint\footnote{Toroidal spaces have more than one midpoint.} between the two.
 
 %\subsubsection{Get Closest}
 \item The function \texttt{getClosest} returns the point closest to $ center$ from a list of $ candidates$, measured by the distance function.
@@ -453,25 +446,21 @@ For a ring based DHTs.
 
 
 \subsection{Implementing Kademlia and Other Tree Based Topologies}
-The largest complication in implementing Kademlia is the exclusive or, or XOR, metric which is used for distance.
+Kademlia uses the exclusive or, or XOR, metric for distance.
 This metric, while non-euclidean, is perfectly acceptable for calculating distance in Kademlia \cite{kademlia}.
-However, XOR does not have an intuitive midpoint we could use for DGVH.
-
-To solve this, we used the XOR metric defined by Kademlia as the distance function and the midpoint function.
 For two given keys $ a $ and $ b $
 
-\[ disance(a, b) = midpoint(a, b) = a  \oplus b\]
+\[ disance(a, b) = a  \oplus b\]
 
 We then implemented handle long peers.
 
 \subsection{Implementing A DHT in an Arbitrary Euclidean Geometry}
 
-We used a toroidal Euclidean geometry as the default space when building UrDHT and DGVH \cite{dgvh}.
-This uses the following \texttt{distance} and \texttt{midpoint} functions.
+We used a Euclidean geometry as the default space when building UrDHT and DGVH \cite{dgvh}.
 For two vectors $\vec{a}$ and $\vec{b}$ in $d$ dimensions: 
 
 \[distance\left(\vec{a}, \vec{b}\right) = \sqrt{\sum\limits_{i\in d} \left(|\vec{a}_i-\vec{b}_i|\right)^2}\]
-\[midpoint\left(\vec{a}, \vec{b}\right) =  \left[\frac{(a_0, b_0)}{2},\frac{(a_1, b_1)}{2}, ... ,\frac{(a_d, b_d)}{2} \right] \]
+
 
 We use DGVH as normal and set the minimum number of short peers to $3d+1$, a value we found through experiments \cite{dgvh}.
 Long peers are randomly selected from the left-over candidates after DGVH is performed \cite{dgvh}.
@@ -497,16 +486,13 @@ Another non-euclidean geometry UrDHT can work in is a hyperbolic geometry.
 
 We implemented a DHT within a hyperbolic geometry using a Poincar\`{e} disc model.
 
-For 2 given points $a$ and $b$ in a Euclidean vector space, the \texttt{distance} in the  Poincar\`{e} disc is:
+For any two given points $a$ and $b$ in a Euclidean vector space, the \texttt{distance} in the  Poincar\`{e} disc is:
 
 
 \[ distance(a, b) = \operatorname{arcosh} \left(  1+ 2 \frac{ \left\| a - b \right\| ^{2} }{ ( 1 - \left\| a \right\| ^{2} ) ( 1 - \left\| b \right\| ^{2} ) }\right) \]
 
 
-However, the solving for the midpoint in the Poincar\`{e} disc model was nontrivial.
-We got around this by transforming the points from the Poincar\'{e} disc to a Beltrami-Klein model
-
-Now that we have a \texttt{distance} and \texttt{midpoint}, DGVH can generate a Delaunay Triangulation for the space.
+Now that we have a \texttt{distance} , DGVH can generate a Delaunay Triangulation for the space.
 
 
 \subsubsection{Okay, this is interesting, but why bother?}
