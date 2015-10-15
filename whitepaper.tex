@@ -435,36 +435,51 @@ In some case it may more convenient implement \texttt{handleLongPeers} as part o
 
 \section{Implementing other DHTs}
 \label{sec:implement}
-\subsection{Implementing Chord and Ring-Based Topology}
+\subsection{Implementing Chord}
 
 Ring topologies are fairly straightforward since they act as are one dimensional Voronoi tessellations, splitting up what is effectively a modular number line among multiple nodes.
 
-Chord can be implemented using a fairly straightforward distance function.
-Given two integer keys $ a $ and $ b $ and a maximum value $ 2^{m} $, the \texttt{distance } from $ a $ to $ b $ in Chord's unidirectional ring is: 
+Chord uses a unidirectional distance function.
+Given two integer keys $ a $ and $ b $ and a maximum value $ 2^{m} $, the \texttt{distance} from $ a $ to $ b $ in Chord's unidirectional ring is: 
 \[ distance(a,b) =
 \begin{cases}
-	2^m + b - a, & \text{if} b - a < 0 \\
+	2^m + b - a, & \text{if } b - a < 0 \\
 	b-a, & \text{otherwise}
 \end{cases}
   \]
 
 
+Short peer selection is trivial in chord, so rather than using DGVH for \texttt{getDelaunayPeers}, each node chooses  from the list of candidates the candidate closest to it (predecessor) and the candidate it is closest to (successor).
 
+Chord's finger (long peer) selection strategy is emulated by \texttt{handleLongPeers}.
+For each of the $i$th bits in the hash function, we choose a long peer $ p_i $ from the candidates such that 
 
-For a ring based DHTs.
+\[ p_i = \left\{c \in Candidates |  \min\left(distance(c, t_{i})\right) \right\}  \]
+where
+\[t_{i} =  (n + 2^{i}) \mod 2^m \]
+
+%for i in range(0, HASHBASE):
+%target = tuple([(center[0] + 2**i) % HASHMAX])
+%subject = min(others, key=lambda x: chordDist(x.loc, target))
 %We know Chord's invariants are not (citation), but our protocol isn't affected by these constraints
 
 
-\subsection{Implementing Kademlia and Other Tree Based Topologies}
+\subsection{Implementing Kademlia}
 Kademlia uses the exclusive or, or XOR, metric for distance.
 This metric, while non-euclidean, is perfectly acceptable for calculating distance in Kademlia \cite{kademlia}.
 For two given keys $ a $ and $ b $
 
 \[ disance(a, b) = a  \oplus b\]
 
-We then implemented handle long peers.
+The \texttt{getDelaunayPeers} function uses DGVH as normal to choose the short peers for node $n$.
+We then used Kademlia's $k$-bucket strategy \cite{kademlia} for \texttt{handleLongPeers}.
+The remaining candidates are placed into buckets, each capable holding a maximum of $k$ long peers.
 
-\subsection{Implementing A DHT in an Arbitrary Euclidean Geometry}
+To summarize briefly, node $n$ starts with a single bucket containing $n$, covering long peers for the entire range.
+When attempting to add a candidate to a bucket already containing $k$ long peers, if the bucket contains node $n$, the bucket is split into two buckets, each covering half of that buckets range.
+Further details of how Kademlia $k$-buckets work can be found in the Kademlia protocol paper \cite{kademlia}.
+
+\subsection{Implementing a DHT in an Arbitrary Euclidean Geometry}
 
 We used a Euclidean geometry as the default space when building UrDHT and DGVH \cite{dgvh}.
 For two vectors $\vec{a}$ and $\vec{b}$ in $d$ dimensions: 
@@ -472,16 +487,17 @@ For two vectors $\vec{a}$ and $\vec{b}$ in $d$ dimensions:
 \[distance\left(\vec{a}, \vec{b}\right) = \sqrt{\sum\limits_{i\in d} \left(|\vec{a}_i-\vec{b}_i|\right)^2}\]
 
 
-We use DGVH as normal and set the minimum number of short peers to $3d+1$, a value we found through experiments \cite{dgvh}.
+We use implement \texttt{getDelaunayPeers} using DGHV and set the minimum number of short peers to $3d+1$, a value we found through experimentation \cite{dgvh}.
+
 Long peers are randomly selected from the left-over candidates after DGVH is performed \cite{dgvh}.
 The maximum size of long peers is set to $(3d+1)^2$, but it can be lowered or eliminated if desired and maintain $ O(\sqrt[d]{n}) $ routing time.
 
 
-\subsection{ZHT}
+%\subsection{ZHT}
 ZHT \cite{li2013zht} leads to an extremely trivial implementation in UrDHT.
 Unlike other DHTs, ZHT assumes an extremely low rate of churn.
 As a result, the topology of ZHT is a clique, with each node having an edge to all other nodes, yielding $ O(1) $ lookup times with an $ O(n) $ memory cost.
-
+%
 The only change that needs to be made is to \texttt{handleLongPeers}.
 Any peer that is not a short peer becomes a long peer, with no upper bound on the size of the long peer list.
 \subsection{DHTs in a Hyperbolic Topology}
@@ -491,23 +507,20 @@ Any peer that is not a short peer becomes a long peer, with no upper bound on th
 We have already shown with Kademlia that UrDHT can operate in a non-Euclidean geometry.
 Another non-euclidean geometry UrDHT can work in is a hyperbolic geometry.
 
-
-
 We implemented a DHT within a hyperbolic geometry using a Poincar\`{e} disc model.
 To do this, we implemented \texttt{idToPoint} to create a random point in Euclidean space from a uniform distribution.
 This point is then mapped to a Poincar\`{e} disc model to determine the appropriate Delaunay peers.
-
-
 For any two given points $a$ and $b$ in a Euclidean vector space, the \texttt{distance} in the  Poincar\`{e} disc is:
 
 
 \[ distance(a, b) = \operatorname{arcosh} \left(  1+ 2 \frac{ \left\| a - b \right\| ^{2} }{ ( 1 - \left\| a \right\| ^{2} ) ( 1 - \left\| b \right\| ^{2} ) }\right) \]
 
 
-Now that we have a \texttt{distance} function, DGVH can generate a Delaunay Triangulation for the space.
+Now that we have a \texttt{distance} function, DGVH can be used in \texttt{getDelaunayPeers} to generate a Delaunay Triangulation for the space.
+The \texttt{getDelaunayPeers} and \texttt{handleLongPeers} functions are otherwise implemented exactly as they were implemented for Euclidean spaces. 
 
 
-%\subsubsection{Okay, this is interesting, but why bother?}
+\subsubsection{Okay, this is interesting, but why bother?}
 Because we it was difficult
 
 Because it shows that UrDHT and DGVH both work in arbitrary geometries.
@@ -531,15 +544,28 @@ Our experiments demonstrate that topologies implemented using UrDHT converge to 
 We demonstrate that lookup operations in these meshes can be done in sublinear time.
 
 Tests
-In time over a randomly populated network
-Iterative joins, start with one node
+k connected randomly populated network
+vars:
+k for your k connected network 10, 20
+duration what we have works
+size 100, 500, 1000, 5000 if possible,
 
-parameters
-Network diameter
-greedy routing distance 
-greedy routing success rate 
+Iterative joins, start with one node
+vars:  join rate (ticks per join) ,1 3 
+final size  100, 500, 1000, 5000 if possible,
+join method (bootstrapping size)  all,
+
+outputs
+Network diameter at tick
+avg greedy routing distance
+greedy routing success rate at tick
 maximum degree
-average degree
+mean degree
+std deviatation degree
+Anything we want for degree
+
+
+Graph max degree vs expected  maximimum degree  (this is short peers)
 
 
 
@@ -562,13 +588,13 @@ We showed in worked in DGVH, it should work in a hyperbolic space.
 
 
 
-\subsection{Remarks}
-Our experiments show that Euclidean and Hyperbolic topologies offer a distinct advantage over Chord and Kademlia.
-Chord and Kademlia cannot create a organized network from an initially randomly connected graph.
-Because Chord and Kademlia are highly selective in what they select in long peers, this first pass culling reduces the initially connected graph into multiple disjoint sets from which it cannot recover.
-
-We have demonstrated here and in our previous works that DHTs in Euclidean and Hyperbolic topologies can converge from a randomized topology. 
-This means so long as the graph is connected
+%\subsection{Remarks}
+%Our experiments show that Euclidean and Hyperbolic topologies offer a distinct advantage over Chord and Kademlia.
+%Chord and Kademlia cannot create a organized network from an initially randomly connected graph.
+%Because Chord and Kademlia are highly selective in what they select in long peers, this first pass culling reduces the initially connected graph into multiple disjoint sets from which it cannot recover.
+%
+%We have demonstrated here and in our previous works that DHTs in Euclidean and Hyperbolic topologies can converge from a randomized topology. 
+%This means so long as the graph is connected
 
 %With an initial $k$-connected graph, the first step is for nodes to select short and long peers.
 
