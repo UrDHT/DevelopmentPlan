@@ -33,13 +33,13 @@
 \maketitle
 
 \begin{abstract}
-Distributed Hash Tables (DHTs) have an inherent set qualities, such as greedy routing, maintaining lists of peers which define the topology, and form an overlay network.
+Distributed Hash Tables (DHTs) have an inherent set of qualities, such as greedy routing, maintaining lists of peers which define the topology, and form an overlay network.
 Rather than having a developer be concerned with the details of a given DHT, we have constructed a new framework, UrDHT, that generalizes the functionality and implementation of various DHTs.
 
 UrDHT is an abstract model of a Distributed Hash Table.
 It maps the topologies of DHTs to the primal-dual problem of Voronoi Tessellation and Delaunay Triangulation.
 By completing a few simple functions, a developer can implement the topology of any DHT in any arbitrary space using UrDHT.
-For example, we implemented a DHT operating in a hyperbolic space, a previously unexplored nontrivial metric space with potential applications.
+For example, we implemented a DHT operating in a hyperbolic space, a previously unexplored nontrivial metric space with potential applications, such as latency embedding.
 
 %Latency embedding will not be included in this paper
 %One topology of particular interest we created is a DHT operating within a Poincar\'{e} disk model.
@@ -66,9 +66,9 @@ For example, we implemented a DHT operating in a hyperbolic space, a previously 
 
 
 
-UrDHT is an abstract model of a distributed hash table (DHT) which solves a number of problems.
-First, it is a unified and cohesive model for creating DHTs and P2P applications based on DHTs.
-Second, it provides a single network for bootstrapping distributed applications.
+UrDHT is an abstract model of a distributed hash table (DHT). %that solves a number of problems.
+It is a unified and cohesive model for creating DHTs and P2P applications based on DHTs.
+%UrDHT also provides a single network for bootstrapping distributed applications.
 %Third, we show that using the abstraction features of UrDHT, we can embed latency into the DHT's overlay.
 %
 %\subsubsection{Abstraction}
@@ -81,11 +81,11 @@ Despite this, no one has created a cohesive formal specification for building a 
 Our primary motivation for this project was to create an abstracted model for Distributed Hash Tables based on observations we made during previous research \cite{dgvh}.
 We found that all DHTs can cleanly be mapped to the primal-dual problems of Voronoi Tessellation and Delaunay Triangulation.
 
-UrDHT directly builds its topology upon this insight.
+UrDHT builds its topology directly upon this insight.
 It uses a greedy distributed heuristic for approximating Delaunay Triangulations.
 UrDHT is our specification of an abstract DHT, which can be used to build many different DHTs.
 We found that we could reproduce the topology of different DHTs by defining a selection heuristic and rejection algorithm for the geometry the DHT operates within.
-For every DHT we tried, our greedy approximation of Delaunay Triangulation produced a stable DHT, regardless of the geometry the DHT existed within.  
+For every DHT we implemented, our greedy approximation of Delaunay Triangulation produced a stable DHT, regardless of the geometry the DHT.  
 This works in non-Euclidean geometries such as XOR (Kademlia) or even a hyperbolic geometry represented by a Poincar\`{e} disc.
 
 The end result is not only do we have an abstract model of DHTs, we have a simple framework that developers can use to quickly create new distributed applications.
@@ -94,22 +94,22 @@ This simple framework allows generation of internally consistent implementations
 
 
 %\subsubsection{Bootstrapping}
-Another poorly addressed issue within DHTs and DHT-based P2P applications we wish to tackle with UrDHT is the what we have termed the \textit{bootstrapping problem}.
-Simply put, a node can only join the network if it knows another node that is already a member of the network it is trying to join.
-%Current distributed systems suffer from fragmentation, high overhead, and an inability to scale due to difficulty of adoption.
-
-The way this generally works is by having a potential user manually look up at a centralized source, such as the project or application's website, the bootstrapping information for the network.
-It is a philosophical conflict requiring a distributed application to use a centralized source of information to build a distributed network.
-
-UrDHT has the potential to be a distributed source for bootstrapping information for other distributed networks.
-This would make new distributed applications easier to adopt by creating a network to bootstrap \textit{other networks}.
-UrDHT does this by making it easy to add other networks as a service.
+%Another poorly addressed issue within DHTs and DHT-based P2P applications we wish to tackle with UrDHT is the what we have termed the \textit{bootstrapping problem}.
+%Simply put, a node can only join the network if it knows another node that is already a member of the network it is trying to join.
+%%Current distributed systems suffer from fragmentation, high overhead, and an inability to scale due to difficulty of adoption.
+%
+%The way this generally works is by having a potential user manually look up at a centralized source, such as the project or application's website, the bootstrapping information for the network.
+%It is a philosophical conflict requiring a distributed application to use a centralized source of information to build a distributed network.
+%
+%UrDHT has the potential to be a distributed source for bootstrapping information for other distributed networks.
+%This would make new distributed applications easier to adopt by creating a network to bootstrap \textit{other networks}.
+%UrDHT does this by making it easy to add other networks as a service.
 
 %\subsubsection*{Accomplishments}
 To summarize our contributions:
 \begin{itemize}
 	\item We give a formal specification for what needs to be defined in order to create a functioning DHT.
-	While there has long existed a well known protocol shared by distributed hash tables, these define what a DHT does.
+	While there has long existed a well known protocol shared by distributed hash tables, this defines what a DHT does.
 	It does not describe what a DHT is.
 	
 	We show that DHTs cleanly map to the primal-dual problem of Delaunay triangulations and Voronoi tessellations.
@@ -117,8 +117,8 @@ To summarize our contributions:
 	
 	\item We present UrDHT as an abstract DHT and show how a developer can tweak the functions we defined to create an arbitrary new DHT topology (Section \ref{sec:urdht}).
 	\item We show how to reproduce the topology of Chord and Kademlia using UrDHT.
-	We also implement a DHT in a hyperbolic geometry represented  by a Poincar\`{e} disc.
-	We also discuss how we can use UrDHT to run subnetworks as a service (Section \ref{sec:implement}).
+	We also implement a DHT in a hyperbolic geometry represented  by a Poincar\`{e} disc (Section \ref{sec:implement}).
+%	We also discuss how we can use UrDHT to run subnetworks as a service.
 	\item We conduct experiments that show building DHTs using UrDHT produced efficiently routable network topologies, no matter what geometry the overlay topology  is based in (Section \ref{sec:experiments}). 
 	\item We discuss the ramifications of our work and what future work is available.
 \end{itemize}
@@ -129,16 +129,16 @@ To summarize our contributions:
 
 A distributed hash table is usually defined by its protocol; in other words, what it can do.
 Nodes and data in a DHT are assigned unique\footnote{Unique with astronomically high probability, given a large enough consistent hash algorithm.} keys via a consistent hashing algorithm.
-To make it easier to grok the context, we will call the key associated with a node its ID and refer to nodes and their IDs interchangeably.
+To make it easier to intuitively understand the context, we will call the key associated with a node its ID and refer to nodes and their IDs interchangeably.
 
 A DHT can perform the \texttt{lookup(key)}, \texttt{get(key)}, and \texttt{store(key, value)} operations.\footnote{There is typically a \textit{delete(key)} operation defined too, but it is not strictly necessary.}
 The \texttt{lookup} operation returns the node responsible for a queried key.
 The \texttt{store} function stores that key/value pair in the DHT, while \texttt{get} returns the value associated with that key.
 
 However, this is what a DHT \textit{does}, viewing the DHT as a black box, not what a DHT \textit{is} and needs to be implemented.
-We show that Distributed Hash Tables are just Voronoi tessellations and Delaunay triangulation.
+We show that Distributed Hash Tables are essentially Voronoi Tessellations and Delaunay Triangulations.
 
-\subsection{DHTs, Delaunay Triangulation, and Voronoi Tesselation}
+\subsection{DHTs, Delaunay Triangulation, and Voronoi Tessellation}
 
 Nodes in different DHTs have, what appears at the first glance, wildly disparate ways of keeping track of peers, the other nodes in the network.
 However, peers can be split into two groups.
@@ -149,7 +149,7 @@ A node is responsible for a key if and only if its ID is closest to the given ke
 Short peers define the DHTs topology and guarantee that the greedy routing algorithm shared by all DHTs works.
 
 
-All other peers comprise the \textit{long peers}.
+%All other peers comprise the \textit{long peers}.
 Long peers are the nodes that allow a DHT to achieve sublinear routing speeds, typically $ \log(n) $ hops.
 A DHT can still function without long peers.
 
@@ -183,10 +183,17 @@ Otherwise, if I know who is responsible for this key, I return that node.
 Finally, if that is not the case, I forward this query to the node I know with shortest distance from the node to the desired key.\footnote{This order matters, as some DHTs such as Chord are unidirectional.} 
 
 Between individual DHTs, this algorithm might be implemented either recursively or iteratively.
-It will certainly have differences in how a node handles errors, such as how to handle connecting to a failed node which no longer exists.
+It will certainly have differences in how a node handles errors, such as how to handle connecting to a failed node that no longer exists.
 This algorithm may possibly be  run in parallel, such as in Kademlia \cite{kademlia}.
 Despite this, the base greedy algorithm is always the same between implementations.
 
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.75\linewidth]{voronoi}
+	\caption{An example Voronoi diagram for objects on a 2-dimensional space.  The black lines correspond to the borders of the Voronoi region, while the dashed lines correspond to the edges of the Delaunay Triangulation.}
+	\label{voro-ex}
+\end{figure}
 
 
 With the components of a DHT defined above we can now show the relationship between DHTs and the primal-dual problems of Delaunay Triangulation and Voronoi Tessellation.
@@ -196,26 +203,26 @@ This would make the range of keys a node is responsible correspond to the node's
 Long peers serve as shortcuts across the mesh formed by Delaunay triangulations.
 
 
-Thus, if we can calculate the Delaunay triangulation between nodes in a DHT, we have a generalized means of created the overlay network.
+Thus, if we can calculate the Delaunay triangulation between nodes in a DHT, we have a generalized means of creating the overlay network.
 This can be done with any algorithm that calculates the Delaunay Triangulation.
 
 Computing the Delaunay Triangulation and/or the Voronoi Tesselation of a set of points is a well analyzed problem.
 Many algorithms exist which efficiently compute a Voronoi tessellation for a given set of points on a plane, such as Fortune's sweep line algorithm \cite{fortune1987sweepline}.
 
-However, many DHTs are distributed and many of the algorithms to compute Delaunay Triangulation and/or Delaunay Triangulation are unsuited to a distributed environment.
+However, DHTs are distributed and many of the algorithms to compute Delaunay Triangulation and/or Delaunay Triangulation are unsuited to a distributed environment.
 In addition, the computation cost increases when we move into spaces with greater than two dimensions.
 In general, finding the Delaunay Triangulation of $n$ points in a space with $d$ dimensions takes $O(n^{\frac{2d-1}{d}})$ time \cite{watson1981computing}.
 
 
 Is there an algorithm we can use to efficiently calculate Delaunay Triangulations for a distributed system in an arbitrary space?
-We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH), explained below \cite{dgvh}.
+We created an algorithm called the Distributed Greedy Voronoi Heuristic (DGVH), explained below \cite{dgvh}.
 
 
 \subsection{Distributed Greedy Voronoi Heuristic}
 \label{sec:dgvh}
 
 
-The Distributed Greedy Voronoi Heuristic (DGVH) is an method for nodes to define their individual Voronoi region (Algorithm \ref{alg:dgvh}). 
+The Distributed Greedy Voronoi Heuristic (DGVH) is an efficient method for nodes to define their individual Voronoi region (Algorithm \ref{alg:dgvh}). 
 DVGH selects nearby nodes that would correspond to points connected to it within a Delaunay triangulation.
 Our previous implementation relied on a midpoint function \cite{dgvh}.
 We have refined our heuristic to render a midpoint function unnecessary.
@@ -223,10 +230,10 @@ We have refined our heuristic to render a midpoint function unnecessary.
 The heuristic is described in Algorithm \ref{alg:dgvh}.
 Every maintenance cycle, nodes exchange their peer lists with their short peers.
 A node creates a list of candidates by combining their peer lists with their neighbor's peer lists.\footnote{In our previous paper, nodes exchange short peer lists with a single peer. Calls to DGVH in this paper use the information from all their short peers.}
-This list of peers is then sorted from closest to furthest distance.
+Sort the list of peers from closest to furthest distance.
 The node then initializes a new peer list with the closest candidate.
-For each of the remaining candidates, the node calculates compares the distance between the current short peers and the candidate.
-If new peer list does not contain any short  peers closer to the candidate than the node, the candidate is added to the new peer list.
+For each of the remaining candidates, the node compares the distance between the current short peers and the candidate.
+If the new peer list does not contain any short  peers closer to the candidate than the node, the candidate is added to the new peer list.
 Otherwise, the candidate is set aside.
 
 The resulting short peers are a subset of the node's actual Delaunay neighbors.
@@ -274,23 +281,24 @@ The expected maximum size of $ candidates $ corresponds to the expected maximum 
 This is  $\Theta(\frac{\log n}{\log \log n} )$, regardless of the number of the dimensions \cite{bern1991expected}. 
 We can therefore expect \textit{short peers} to be bounded by $\Theta(\frac{\log n}{\log \log n})$.
 
-This makes the expected worst case cost of DGVH \(O(\frac{\log^{4} n}{\log^{4} \log n} )\) \cite{dgvh}, regardless of the dimension \cite{dgvh}.\footnote{As mentioned in the previous footnote, if we are exchanging peers with a single neighbor rather than all our neighbors, the cost lowers to \(O(\frac{\log^{2} n}{\log^{2} \log n} )\).}
-It most cases, this cost much lower, on the order of is $ O(dk\log(k) + k^{2} ) $ for $ d $ dimensions and $ k $ candidates.
-Additional details can be found in our previous work \cite{dgvh}
+The expected worst case cost of DGVH is \(O(\frac{\log^{4} n}{\log^{4} \log n} )\) \cite{dgvh}, regardless of the dimension \cite{dgvh}.\footnote{As mentioned in the previous footnote, if we are exchanging peers with a single neighbor rather than all our neighbors, the cost lowers to \(O(\frac{\log^{2} n}{\log^{2} \log n} )\).}
+In most cases, this cost much lower, on the order of $ O(dk\log(k) + k^{2} ) $ for $ d $ dimensions and $ k $ candidates.
+Additional details can be found in our previous work \cite{dgvh}.
 
 
 
-
-We have tested DGVH on Chord (a ring-based topology), Kademlia (a XOR-based tree topology), general Euclidean spaces, and even in a hyperbolic geometry.
+%TODO Justify euclidea and hyperbolic geometry
+We have tested DGVH on Chord (a ring-based topology), Kademlia (an XOR-based tree topology), general Euclidean spaces, and even in a hyperbolic geometry.
+This is interesting because not only can we implement the contrived topologies of existing DHTs, but more generalizable topologies like Euclidean or hyperbolic geometries.
 We show in Section \ref{sec:experiments} that DGVH works in all of these spaces.
-DGVH only needs the followoing functions to be defined in order for nodes to perform lookup operations and determine responsibility.
+DGVH only needs the following functions to be defined in order for nodes to perform lookup operations and determine responsibility.
 
-%TODO Which of theses are the discrimination metric
+
 \begin{itemize}
 	\item \textbf{A \texttt{distance} function } - This measures distance in the overlay formed by the Distributed Hash Table.
 	In most DHTs, the distance in the overlay has no correlation with real-world attributes.
 	
-	\item \textbf{An \texttt{responsibility} definition}  This defines the range of keys a node is responsible for. 
+	\item \textbf{A \texttt{responsibility} definition}  This defines the range of keys a node is responsible for. 
 	Not every DHT defines which node is responsible for particular keys in the same way. 
 	For example, nodes in Kademlia are responsible for the keys closest to themselves, while in Chord, nodes are responsible for the keys falling between themselves and the preceding node.
 \end{itemize}
@@ -308,12 +316,12 @@ The name of UrDHT comes from the the German prefix \textit{ur}, which means ``or
 Our name states that all DHTs can spring from UrDHT.
 
 UrDHT is divided into 3 broad components: Storage, Networking, and Logic.
-Storage handles file storage and network dictates the protocol for how nodes communicate.
-These components deal with the lower level mechanics of how files are stored on the network and how bits are transmitted through the network.
-The specifics are outside the scope of the paper, but can be found on the UrDHT Project \cite{urdht}.
+Storage handles file storage and Networking dictates the protocol for how nodes communicate.
+These components oversee the lower level mechanics of how files are stored on the network and how bits are transmitted through the network.
+The specifics are outside the scope of the paper, but can be found on the UrDHT Project site \cite{urdht}.
 
 Most of our discussion will focus on the Logic component.
-The Logic component is what dictates the behavior of node within the DHT and the construction of the overlay network.
+The Logic component is what dictates the behavior of nodes within the DHT and the construction of the overlay network.
 It is composed of two parts: the DHT Protocol and the Space Math.
 
 The DHT Protocol contains the canonical operations that a DHT performs, while the Space Math is what effectively distinguishes one DHT from another.
@@ -329,8 +337,10 @@ There is no need for a developer to change anything in the DHT Protocol, but it 
 The DHT Protocol depends on functions from Space Math in order to perform operations within the specified space.
 
 Many of the function calls should be familiar to anyone who has study DHTs.
-We will discuss the a few new functions we added and the onces that contribute to node maintenance.
+We will discuss a few new functions we added and the ones that contribute to node maintenance.
 
+
+%TODO Further justify lookup
 The first thing we note is the absence of \texttt{lookup}.
 In our efforts to further abstract DHTs, we have replaced \texttt{lookup} using the function \texttt{seek}.
 The \texttt{seek} function acts a single step of \texttt{lookup}.
@@ -339,7 +349,8 @@ Nodes can perform \texttt{lookup} by iteratively calling \texttt{seek} until it 
 
 
 The \texttt{join} operation takes in a set of bootstrap nodes, called $ candidates $, rather than a single node.
-This is part of are assumptions about how UrDHT can be used as a bootstrap network by providing bootstrapping information for a particular network.
+This is part of our plans about how UrDHT can be used as a bootstrap network by providing bootstrapping information for a particular network.
+We expect nodes that want to join a particular network to be able to query UrDHT and receive a list of nodes that they can use to bootstrap the joining.
 
 The joining node randomly selects one of these $ candidates $ and finds the ``parent'' node currently responsible for the space.
 The joining node then populates its short peers using the ``parent'' node's short peers.
@@ -348,7 +359,7 @@ Once that has been finished, the joining node starts its maintenance thread.
 
 
 
-%TODO check truth
+
 Maintenance is done via gossip.
 Each maintenance cycle, the node recalculates its Delaunay (short) peers using its neighbor's peer list and any nodes that have notified it since the last maintenance cycle.
 This is done using DGVH by default, but could be done with some other algorithm.
@@ -356,9 +367,9 @@ Once those are calculated, the node handles modifying its long peers, as dictate
 
 \subsection{The Space Math}
 \label{sec:space}
-The Space Math consists of the functions which define the DHT's topology.
+The Space Math consists of the functions that define the DHT's topology.
 It requires a way to generate short peers to form a routable overlay and a way to choose long peers.
-We provide DGVH for generating short peers, which works in every space we have tried.
+We use DGVH for generating short peers, which works in every space tested.
 Space Math requires the following functions when using DGVH:
 
 \begin{itemize}
@@ -383,13 +394,13 @@ Depending on what you want to measure, \texttt{getClosest} might measure the dis
 
 %\subsubsection{Get Delaunay (short) Peers}
 \item We use the above functions to implement  \texttt{getDelaunayPeers}.
-Given a set of points, the $ candidates$, and a center point $ centers$, \texttt{getDelaunayPeers} calculates a mesh that of the Delaunay peers of $ center$.
+Given a set of points, the $ candidates$, and a center point $ centers$, \texttt{getDelaunayPeers} calculates a mesh that is made up of the Delaunay peers of $ center$.
 
-We assume that this is done using DGVH, shown the Python code 
+We assume that this is done using DGVH, shown by the Python code 
 in Listing \ref{lst:dgvh}
 
-%TODO  I don't see any minimums here
-
+%TODO I don't see any minimums here
+%TOD Put minimum in here
 \begin{lstlisting}[basicstyle=\scriptsize\ttfamily,  breaklines=true, caption={\texttt{getDelaunayPeers()}}, label={lst:dgvh}, frame=single] 
 def getDelaunayPeers(candidates,center):    
 	if len(candidates) < 2:
@@ -412,16 +423,16 @@ def getDelaunayPeers(candidates,center):
 %\subsubsection{Handle Long Peers}
 
 \item The final function is \texttt{handleLongPeers}.
-\texttt{handleLongPeers} takes in a list of $ candidates $ and a $ center$, much like \texttt{getDelaunayPeers}, and returns  a set of peers to act as routing shortcuts.
-%TODO it actually raises the question, how should it work?  Since we shouldn't recalculate long peers from scratch every time.
+\texttt{handleLongPeers} takes in a list of $ candidates $ and a $ center$, much like \texttt{getDelaunayPeers}, and returns a set of peers to act as routing shortcuts.
+
 
 The implementation of this function should vary greatly from one DHT to another.
-For example, long peers in Symphony \cite{symphony} and other small-world \cite{kleinberg2000navigation} networks choose long peers using a probability distribution.
+For example, Symphony \cite{symphony} and other small-world \cite{kleinberg2000navigation} networks choose long peers using a probability distribution.
 Chord has a much more structured distribution, with each long peer being increasing powers of 2 distance away from the node \cite{chord}.
 
 
 
-In some case it may more convenient implement \texttt{handleLongPeers} as part of \texttt{getDelaunayPeers}.
+%In some case it may more convenient implement \texttt{handleLongPeers} as part of \texttt{getDelaunayPeers}.
 
 \end{itemize}
 
@@ -454,9 +465,12 @@ Short peer selection is trivial in chord, so rather than using DGVH for \texttt{
 Chord's finger (long peer) selection strategy is emulated by \texttt{handleLongPeers}.
 For each of the $i$th bits in the hash function, we choose a long peer $ p_i $ from the candidates such that 
 
+%TODO My mathfu is weak I need help
+
 \[ p_i = \left\{c \in Candidates |  \min\left(distance(c, t_{i})\right) \right\}  \]
 where
 \[t_{i} =  (n + 2^{i}) \mod 2^m \]
+for the current node $n$.
 
 %for i in range(0, HASHBASE):
 %target = tuple([(center[0] + 2**i) % HASHMAX])
@@ -479,28 +493,32 @@ To summarize briefly, node $n$ starts with a single bucket containing $n$, cover
 When attempting to add a candidate to a bucket already containing $k$ long peers, if the bucket contains node $n$, the bucket is split into two buckets, each covering half of that buckets range.
 Further details of how Kademlia $k$-buckets work can be found in the Kademlia protocol paper \cite{kademlia}.
 
-\subsection{Implementing a DHT in an Arbitrary Euclidean Geometry}
+
+\subsection{ZHT}
+ZHT \cite{li2013zht} leads to an extremely trivial implementation in UrDHT.
+Unlike other DHTs, ZHT assumes an extremely low rate of churn.
+It bases this rationale on the fact that tracking $ O(n) $ peers in memory is trivial.
+This indicates the $ O( \log n)  $  memory  requirement for other DHTs is overzealous and not based on a memory limitation.
+Rather, the primary motivation for keeping a limited subset of the network in memory is more due to the cost of maintenance messages.
+ZHT shows, that by assuming low rates of churn (and infrequent maintenance messages as a result), having $O(n)$ peers is a viable tactic for faster lookups.
+
+As a result, the topology of ZHT is a clique, with each node having an edge to all other nodes, yielding $ O(1) $ lookup times with an $ O(n) $ memory cost.
+%
+The only change that needs to be made is to consider all peer candidates to be short peers.
+
+\subsection{Implementing a DHT in a non-contrived Metric Space}
 
 We used a Euclidean geometry as the default space when building UrDHT and DGVH \cite{dgvh}.
 For two vectors $\vec{a}$ and $\vec{b}$ in $d$ dimensions: 
 
-\[distance\left(\vec{a}, \vec{b}\right) = \sqrt{\sum\limits_{i\in d} \left(|\vec{a}_i-\vec{b}_i|\right)^2}\]
+\[distance\left(\vec{a}, \vec{b}\right) = \sqrt{\sum\limits_{i\in d} \left(a_i-b_i\right)^2}\]
 
 
-We use implement \texttt{getDelaunayPeers} using DGHV and set the minimum number of short peers to $3d+1$, a value we found through experimentation \cite{dgvh}.
+We implement \texttt{getDelaunayPeers} using DGHV and set the minimum number of short peers to $3d+1$, a value we found through experimentation \cite{dgvh}.
 
 Long peers are randomly selected from the left-over candidates after DGVH is performed \cite{dgvh}.
 The maximum size of long peers is set to $(3d+1)^2$, but it can be lowered or eliminated if desired and maintain $ O(\sqrt[d]{n}) $ routing time.
 
-
-%\subsection{ZHT}
-ZHT \cite{li2013zht} leads to an extremely trivial implementation in UrDHT.
-Unlike other DHTs, ZHT assumes an extremely low rate of churn.
-As a result, the topology of ZHT is a clique, with each node having an edge to all other nodes, yielding $ O(1) $ lookup times with an $ O(n) $ memory cost.
-%
-The only change that needs to be made is to \texttt{handleLongPeers}.
-Any peer that is not a short peer becomes a long peer, with no upper bound on the size of the long peer list.
-\subsection{DHTs in a Hyperbolic Topology}
 	
 \label{sec:hyper}
 
@@ -516,24 +534,24 @@ For any two given points $a$ and $b$ in a Euclidean vector space, the \texttt{di
 \[ distance(a, b) = \operatorname{arcosh} \left(  1+ 2 \frac{ \left\| a - b \right\| ^{2} }{ ( 1 - \left\| a \right\| ^{2} ) ( 1 - \left\| b \right\| ^{2} ) }\right) \]
 
 
-Now that we have a \texttt{distance} function, DGVH can be used in \texttt{getDelaunayPeers} to generate a Delaunay Triangulation for the space.
-The \texttt{getDelaunayPeers} and \texttt{handleLongPeers} functions are otherwise implemented exactly as they were implemented for Euclidean spaces. 
+Now that we have a \texttt{distance} function, DGVH can be used in \texttt{getDelaunayPeers} to generate an approximate Delaunay Triangulation for the space.
+The \texttt{getDelaunayPeers} and \texttt{handleLongPeers} functions are otherwise implemented exactly as they were for Euclidean spaces. 
 
 
-\subsubsection{Okay, this is interesting, but why bother?}
-Because we it was difficult
-
-Because it shows that UrDHT and DGVH both work in arbitrary geometries.
-For example, handling geographic coordinates. 
 
 
-\subsection{Services}
+Implementing a DHT in hyperbolic geometry has many interesting implications.
+Of particular note, embedding into hyperbolic spaces allows us to explore accurate embeddings of internode latency into the metric space \cite{kleinberg2007geographic} \cite{cvetkovski2009hyperbolic}.
+This has the potential to allow for minimal latency DHTs.
 
-There needs to be an easy way to append data to the bootstrapping list.
 
-To do this, we introduce the \texttt{put} and  \texttt{poll} primitives.
-These functions can considered abstracted versions.
-	
+%\subsection{Services}
+%
+%There needs to be an easy way to append data to the bootstrapping list.
+%
+%To do this, we introduce the \texttt{put} and  \texttt{poll} primitives.
+%These functions can considered abstracted versions.
+%	
 \section{Experiments}
 \label{sec:experiments}
 
@@ -598,7 +616,7 @@ We showed in worked in DGVH, it should work in a hyperbolic space.
 
 %With an initial $k$-connected graph, the first step is for nodes to select short and long peers.
 
-\section{Future Work and Conclusions}
+\section{Applications and Future Work}
 \label{sec:future}
 
 %Restate the intro
