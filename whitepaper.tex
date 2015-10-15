@@ -625,8 +625,10 @@ We showed in worked in DGVH, it should work in a hyperbolic space.
 
 %Restate the intro
 UrDHT is a unified model for DHTs and framework for building distributed applications.
+We have shown how it possible to use UrDHT to not only implement traditional DHTs such as Chord and Kademlia, but also in much more generalized spaces such as Euclidean and Hyperbolic geometries.
 
-Future improvements of UrDHT would further disconnect long peers and short peers giving them their own implementation cycle.
+
+%Future improvements of UrDHT would further disconnect long peers and short peers giving them their own implementation cycle.
 
 %Future stuff
 There are numerous routes we can take with our model.
@@ -635,19 +637,20 @@ Of particular interest are the applications of building a DHT overlay that opera
 One of the other features shared by nearly every DHT is that routing works by minimizing the number of hops across the overlay network, with all hops treated as the same length.
 This is done because it is assumed that DHTs know nothing about the state of actual infrastructure the overlay is built upon.
 
-However, this means that most DHTs will happily route a message from one continent to another and back.
+However, this means that most DHTs could happily route a message from one continent to another and back.
 This is obviously undesirable, but it is the status quo in DHTs.
-This stems from the generation of node IDs in DHTs. 
+The reason for this stems from the generation of node IDs in DHTs. 
 Nodes are typically assigned a point in the range of a cryptographic hash function. 
-This ID corresponds to the hash of some identifier or given a point randomly.
+The ID corresponds to the hash of some identifier or given a point randomly.
 This is done for purposes of load balancing and fault tolerance.
 
-We want to see if there is a means of embedding latency into the DHT, while still maintaining the system's fault tolerance.
+For future work, we want to see if there is a means of embedding latency into the DHT, while still maintaining the system's fault tolerance.
 Doing so would mean that the hops traversed to a destination are, in fact, the shortest path to the destination.
 
-We believe we can embed a latency graph in a hyperbolic space and define UrDHT such that it operates within this space.
+We believe we can embed a latency graph in a hyperbolic space and define UrDHT such that it operates within this space \cite{kleinberg2007geographic} \cite{cvetkovski2009hyperbolic}..
 The end result would be a DHT with latency embedded into the overlay.
 Nodes would respond to changes in latency and the network by rejoining the network at new positions.
+This approach would maintain the decentralized strengths of DHTs, while reducing overall delay and communication costs.
 %We use  a force spring model to accomplish this.
 
 
