@@ -217,7 +217,8 @@ We created an algorithm call the Distributed Greedy Voronoi Heuristic (DGVH), ex
 
 The Distributed Greedy Voronoi Heuristic (DGVH) is an method for nodes to define their individual Voronoi region (Algorithm \ref{alg:dgvh}). 
 DVGH selects nearby nodes that would correspond to points connected to it within a Delaunay triangulation.
-Our previous implementation relied on a midpoint function, but we later found that it was uneeded.
+Our previous implementation relied on a midpoint function \cite{dgvh}.
+We have refined our heuristic to render a midpoint function unnecessary.
 
 The heuristic is described in Algorithm \ref{alg:dgvh}.
 Every maintenance cycle, nodes exchange their peer lists with their short peers.
@@ -438,7 +439,15 @@ In some case it may more convenient implement \texttt{handleLongPeers} as part o
 
 Ring topologies are fairly straightforward since they act as are one dimensional Voronoi tessellations, splitting up what is effectively a modular number line among multiple nodes.
 
-Chord can be run using a 
+Chord can be implemented using a fairly straightforward distance function.
+Given two integer keys $ a $ and $ b $ and a maximum value $ 2^{m} $, the \texttt{distance } from $ a $ to $ b $ in Chord's unidirectional ring is: 
+\[ distance(a,b) =
+\begin{cases}
+	2^m + b - a, & \text{if} b - a < 0 \\
+	b-a, & \text{otherwise}
+\end{cases}
+  \]
+
 
 
 
@@ -482,10 +491,12 @@ Any peer that is not a short peer becomes a long peer, with no upper bound on th
 We have already shown with Kademlia that UrDHT can operate in a non-Euclidean geometry.
 Another non-euclidean geometry UrDHT can work in is a hyperbolic geometry.
 
-\texttt{idToPoint} creates a random point from a uniform distribution.
 
 
 We implemented a DHT within a hyperbolic geometry using a Poincar\`{e} disc model.
+To do this, we implemented \texttt{idToPoint} to create a random point in Euclidean space from a uniform distribution.
+This point is then mapped to a Poincar\`{e} disc model to determine the appropriate Delaunay peers.
+
 
 For any two given points $a$ and $b$ in a Euclidean vector space, the \texttt{distance} in the  Poincar\`{e} disc is:
 
@@ -493,7 +504,7 @@ For any two given points $a$ and $b$ in a Euclidean vector space, the \texttt{di
 \[ distance(a, b) = \operatorname{arcosh} \left(  1+ 2 \frac{ \left\| a - b \right\| ^{2} }{ ( 1 - \left\| a \right\| ^{2} ) ( 1 - \left\| b \right\| ^{2} ) }\right) \]
 
 
-Now that we have a \texttt{distance} , DGVH can generate a Delaunay Triangulation for the space.
+Now that we have a \texttt{distance} function, DGVH can generate a Delaunay Triangulation for the space.
 
 
 %\subsubsection{Okay, this is interesting, but why bother?}
@@ -518,7 +529,6 @@ Using simulations to test the correctness and relative performance of DHTs is st
 
 Our experiments demonstrate that topologies implemented using UrDHT converge to a routable mesh.
 We demonstrate that lookup operations in these meshes can be done in sublinear time.
-Essentially each piece of hardware acts as multiple nodes, with each node running a webserver on top of it.
 
 Tests
 In time over a randomly populated network
@@ -555,10 +565,12 @@ We showed in worked in DGVH, it should work in a hyperbolic space.
 \subsection{Remarks}
 Our experiments show that Euclidean and Hyperbolic topologies offer a distinct advantage over Chord and Kademlia.
 Chord and Kademlia cannot create a organized network from an initially randomly connected graph.
-We had demonstrated here and in our previous works that Euclidean and Hyperbolic topologies like the ones 
-
-With an initial $k$-connected graph, the first step is for nodes to select short and long peers.
 Because Chord and Kademlia are highly selective in what they select in long peers, this first pass culling reduces the initially connected graph into multiple disjoint sets from which it cannot recover.
+
+We have demonstrated here and in our previous works that DHTs in Euclidean and Hyperbolic topologies can converge from a randomized topology. 
+This means so long as the graph is connected
+
+%With an initial $k$-connected graph, the first step is for nodes to select short and long peers.
 
 \section{Future Work and Conclusions}
 \label{sec:future}
@@ -570,7 +582,7 @@ Future improvements of UrDHT would further disconnect long peers and short peers
 
 %Future stuff
 There are numerous routes we can take with our model.
-Of particular interest are the applications of builind a DHT overlay that operates in a hyperbolic geometry.
+Of particular interest are the applications of building a DHT overlay that operates in a hyperbolic geometry.
 
 One of the other features shared by nearly every DHT is that routing works by minimizing the number of hops across the overlay network, with all hops treated as the same length.
 This is done because it is assumed that DHTs know nothing about the state of actual infrastructure the overlay is built upon.
