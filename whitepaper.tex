@@ -12,7 +12,7 @@
 %\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
 \usepackage{algorithm} 
 \usepackage{algpseudocode}
-\usepackage[font=small]{caption}
+\usepackage[font=footnotesize]{caption}
 
 \title{UrDHT: A Unified Model for Distributed Hash Tables}
 
@@ -614,27 +614,27 @@ We show these results in Figures \ref{fig:ChordDegree} - \ref{fig:KademliaDistan
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.7\linewidth]{figs/ChordDegree}
+	\includegraphics[width=\linewidth]{figs/ChordDegree}
 	\caption{This is the average and maximum degree of nodes in the Chord network. This Chord network utilized a 120 bit hash and thus degree is bound at 122 (full fingers, predecessor and successor) when the network reaches $2^{120}$ nodes.}
 	\label{fig:ChordDegree}
 \end{figure}
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.7\linewidth]{figs/ChordDistance}
+	\includegraphics[width=\linewidth]{figs/ChordDistance}
 	\caption{This is the number hops required for a greedy routed lookup in Chord. The average lookup between two nodes follows the expected logarithmic curve.}
 	\label{fig:ChordDistance}
 \end{figure}
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.7\linewidth]{figs/KademliaDegree}
+	\includegraphics[width=\linewidth]{figs/KademliaDegree}
 	\caption{This is the average and maximum degree of nodes in the Kademlia network as new nodes are added.  Both the maximum degree and average degree are $O(\log n)$.}
 	\label{fig:KademliaDegree}
 \end{figure}
 \begin{figure}
 	\centering
-	\includegraphics[width=0.7\linewidth]{figs/KademliaDistance}
+	\includegraphics[width=\linewidth]{figs/KademliaDistance}
 	\caption{Much like Chord, the average degree follows a distinct logarithmic curve, reaching an average distance of approximately three hops when there are 500 nodes in the network.}
 	\label{fig:KademliaDistance}
 \end{figure}
@@ -660,27 +660,27 @@ This presents a strategy for trade-off of the network diameter vs. the overhead 
 
 \begin{figure}
 \centering
-\includegraphics[width=0.7\linewidth]{figs/EucldianDegree}
+\includegraphics[width=\linewidth]{figs/EucldianDegree}
 \caption{Because the long peers increase linearly to the maximum value (49), degree initially rises quickly and then grows  more slowly as the number of long peers ceases to grow and the size short peers increases with network size. }
 \label{fig:EucldianDegree}
 \end{figure}
 
 \begin{figure}
 \centering
-\includegraphics[width=0.7\linewidth]{figs/EucldianDistance}
+\includegraphics[width=\linewidth]{figs/EucldianDistance}
 \caption{The inter-node distance stays constant at 1 until long peers are filled, then rises at the rate of a randomly connected network due to the distribution of long peers selected}
 \label{fig:EucldianDistance}
 \end{figure}
 
 \begin{figure}
 \centering
-\includegraphics[width=0.7\linewidth]{figs/HyperbolicDegree}
+\includegraphics[width=\linewidth]{figs/HyperbolicDegree}
 \caption{The Hyperbolic network uses the same long and short peer strategies to the euclidean network, and thus shows similar results}
 \label{fig:HyperbolicDegree}
 \end{figure}
 \begin{figure}
 \centering
-\includegraphics[width=0.7\linewidth]{figs/HyperbolicDistance}
+\includegraphics[width=\linewidth]{figs/HyperbolicDistance}
 \caption{Like the Euclidean Geometry, our Poincar\`{e} disc based topology has much shorter maximum and average distances.
 }
 \label{fig:HyperbolicDistance}
