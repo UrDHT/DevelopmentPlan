@@ -476,7 +476,7 @@ For each of the $i$th bits in the hash function, we choose a long peer $ p_i $ f
 where
 \[t_{i} =  (n + 2^{i}) \mod 2^m \]
 for the current node $n$.
-
+The \texttt{getClosest} function in Chord should return the candidate with the shortest distance from the candidate to the point.
 %for i in range(0, HASHBASE):
 %target = tuple([(center[0] + 2**i) % HASHMAX])
 %subject = min(others, key=lambda x: chordDist(x.loc, target))
