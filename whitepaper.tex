@@ -588,7 +588,7 @@ Using simulations to test the correctness and relative performance of DHTs is st
 %Graph max degree vs expected  maximimum degree  (this is short peers)
 
 %\subsection{Experimental Setup}
-We tested four different topologies: Chord, Kademlia,  a Euclidean geometry, and a Hyperbolic geometry.
+We tested four different topologies: Chord, Kademlia, a Euclidean geometry, and a Hyperbolic geometry.
 For Kademlia, the size of the $k$-buckets was 3.
 In the Euclidean and Hyperbolic geometries, we set a minimum of 7 short peers and 49 long peers.
 
@@ -606,8 +606,7 @@ For each topology, at each step, we measured:
 We also tested the reachability of nodes in the network.
 At every step, the network is fully reachable.
 
-
-Our results show that Chord and Kademlia show results which correspond that are expected from previous experiments \cite{chord} \cite{kademlia}.
+Our results show that Chord and Kademlia show results that correspond to those expected from previous experiments \cite{chord} \cite{kademlia}.
 This demonstrates that UrDHT is capable of accurately emulating these topologies.
 We show these results in Figures \ref{fig:ChordDegree} - \ref{fig:KademliaDistance}.
 
@@ -630,7 +629,7 @@ We show these results in Figures \ref{fig:ChordDegree} - \ref{fig:KademliaDistan
 \begin{figure}
 	\centering
 	\includegraphics[width=0.7\linewidth]{figs/KademliaDegree}
-	\caption{This is the average and maximum degree of nodes in the Kademlia network as new nodes are added.  Both the maximum degree and average degree are $O(\log n)$}
+	\caption{This is the average and maximum degree of nodes in the Kademlia network as new nodes are added.  Both the maximum degree and average degree are $O(\log n)$.}
 	\label{fig:KademliaDegree}
 \end{figure}
 \begin{figure}
@@ -643,14 +642,15 @@ We show these results in Figures \ref{fig:ChordDegree} - \ref{fig:KademliaDistan
 
 
 The results of our Euclidean and Hyperbolic geometries indicate similar asymptotic behavior: a higher degree produces a lower diameter and average routing. 
-However, the ability to leverage this trade-off is limited by the necessity of maintaining an $ O(\log n $) degree
+However, the ability to leverage this trade-off is limited by the necessity of maintaining an $ O(\log n $) degree.
 These results are shown in Figures \ref{fig:EucldianDegree} - \ref{fig:HyperbolicDistance}.
 
-While we maintain the number of links must be $ O(\log n) $, all DHTs practically bound this number by a constant.  
+While we maintain the number of links must be $ O(\log n)$, all DHTs practically bound this number by a constant.  
 For example, in Chord, this is the number of bits in the hash function plus the number of predecessors/successors.
-Chord and Kademlia fill this bound asymptotically, whereas the long peer strategy used by the Euclidean and Hyperbolic metrics aggressively filled to this capacity, relying on the distribution of long peers to change as the network increased in size.
+Chord and Kademlia fill this bound asymptotically. 
+The long peer strategy used by the Euclidean and Hyperbolic metrics aggressively filled to this capacity, relying on the distribution of long peers to change as the network increased in size rather than increasing the number of utilized long peers.
 This explains why the Euclidean and Hyperbolic spaces have more peers (and thus lower diameter) for a given network size.
-This presents a strategy for trade-off of the network diameter vs the overhead maintenance cost.
+This presents a strategy for trade-off of the network diameter vs. the overhead maintenance cost.
 
 
 %\subsection{Chord}
@@ -658,27 +658,27 @@ This presents a strategy for trade-off of the network diameter vs the overhead m
 %\cite{chord}.
 
 
-\begin{figure}[h]
+\begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{figs/EucldianDegree}
 \caption{Because the long peers increase linearly to the maximum value (49), degree initially rises quickly and then grows  more slowly as the number of long peers ceases to grow and the size short peers increases with network size. }
 \label{fig:EucldianDegree}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{figs/EucldianDistance}
 \caption{The inter-node distance stays constant at 1 until long peers are filled, then rises at the rate of a randomly connected network due to the distribution of long peers selected}
 \label{fig:EucldianDistance}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{figs/HyperbolicDegree}
 \caption{The Hyperbolic network uses the same long and short peer strategies to the euclidean network, and thus shows similar results}
 \label{fig:HyperbolicDegree}
 \end{figure}
-\begin{figure}[h]
+\begin{figure}
 \centering
 \includegraphics[width=0.7\linewidth]{figs/HyperbolicDistance}
 \caption{Like the Euclidean Geometry, our Poincar\`{e} disc based topology has much shorter maximum and average distances.
