@@ -208,7 +208,7 @@ This would make the range of keys a node is responsible correspond to the node's
 Long peers serve as shortcuts across the mesh formed by Delaunay Triangulation.
 
 
-Thus, if we can calculate the Delaunay triangulation between nodes in a DHT, we have a generalized means of creating the overlay network.
+Thus, if we can calculate the Delaunay Triangulation between nodes in a DHT, we have a generalized means of creating the overlay network.
 This can be done with any algorithm that calculates the Delaunay Triangulation.
 
 Computing the Delaunay Triangulation and/or the Voronoi Tessellation of a set of points is a well analyzed problem.
@@ -220,7 +220,7 @@ In addition, the computational cost increases when we move into spaces with grea
 In general, finding the Delaunay Triangulation of $n$ points in a space with $d$ dimensions takes $O(n^{\frac{2d-1}{d}})$ time \cite{watson1981computing}.
 
 
-Is there an algorithm we can use to efficiently calculate Delaunay Triangulations for a distributed system in an arbitrary space?
+Is there an algorithm we can use to efficiently calculate Delaunay Triangulation for a distributed system in an arbitrary space?
 We created an algorithm called the Distributed Greedy Voronoi Heuristic (DGVH), explained below \cite{dgvh}.
 
 
@@ -228,16 +228,16 @@ We created an algorithm called the Distributed Greedy Voronoi Heuristic (DGVH), 
 \label{sec:dgvh}
 
 
-The Distributed Greedy Voronoi Heuristic (DGVH) is an efficient method for nodes to define their individual Voronoi region (Algorithm \ref{alg:dgvh}). 
-DVGH selects nearby nodes that would correspond to points connected to it within a Delaunay triangulation.
+The Distributed Greedy Voronoi Heuristic (DGVH) is an efficient method for nodes to approximate their individual Voronoi region (Algorithm \ref{alg:dgvh}). 
+DGVH selects nearby nodes that would correspond to points connected to it within a Delaunay Triangulation.
 Our previous implementation relied on a midpoint function \cite{dgvh}.
 We have refined our heuristic to render a midpoint function unnecessary.
 
 The heuristic is described in Algorithm \ref{alg:dgvh}.
 Every maintenance cycle, nodes exchange their peer lists with their short peers.
-A node creates a list of candidates by combining their peer lists with their neighbor's peer lists.\footnote{In our previous paper, nodes exchange short peer lists with a single peer. Calls to DGVH in this paper use the information from all their short peers.}
+A node creates a list of candidates by combining their peer lists with their neighbor's peer lists.\footnote{In our previous paper, nodes exchange short peer lists with a single peer. Calls to DGVH in this paper use both short and long peer information from all of their short peers.}
 Sort the list of peers from closest to furthest distance.
-The node then initializes a new peer list with the closest candidate.
+The node then initializes a new peer list, initially containing the closest candidate.
 For each of the remaining candidates, the node compares the distance between the current short peers and the candidate.
 If the new peer list does not contain any short  peers closer to the candidate than the node, the candidate is added to the new peer list.
 Otherwise, the candidate is set aside.
@@ -279,7 +279,7 @@ A crucial feature is that this subset guarantees that DGVH will form a routable 
 \end{algorithm} 
 
 
-Candidates are gathered via a gossip protocol as well as notifications from close peers.
+Candidates are gathered via a gossip protocol as well as notifications from other peers.
 How long peers are handled depends on the particular DHT implementation.
 This process is described more in Section \ref{sec:protocol}.
 
@@ -287,29 +287,28 @@ The expected maximum size of $ candidates $ corresponds to the expected maximum 
 This is  $\Theta(\frac{\log n}{\log \log n} )$, regardless of the number of the dimensions \cite{bern1991expected}. 
 We can therefore expect \textit{short peers} to be bounded by $\Theta(\frac{\log n}{\log \log n})$.
 
-The expected worst case cost of DGVH is \(O(\frac{\log^{4} n}{\log^{4} \log n} )\) \cite{dgvh}, regardless of the dimension \cite{dgvh}.\footnote{As mentioned in the previous footnote, if we are exchanging peers with a single neighbor rather than all our neighbors, the cost lowers to \(O(\frac{\log^{2} n}{\log^{2} \log n} )\).}
-In most cases, this cost much lower, on the order of $ O(dk\log(k) + k^{2} ) $ for $ d $ dimensions and $ k $ candidates.
+The expected worst case cost of DGVH is \(O(\frac{\log^{4} n}{\log^{4} \log n} )\) \cite{dgvh}, regardless of the dimension \cite{dgvh}.\footnote{As mentioned in the previous footnote, if we are exchanging only short peers with a single neighbor rather than all our neighbors, the cost lowers to \(O(\frac{\log^{2} n}{\log^{2} \log n} )\).}
+In most cases, this cost is much lower.
 Additional details can be found in our previous work \cite{dgvh}.
 
 
 
-%TODO Justify euclidea and hyperbolic geometry
+
 We have tested DGVH on Chord (a ring-based topology), Kademlia (an XOR-based tree topology), general Euclidean spaces, and even in a hyperbolic geometry.
 This is interesting because not only can we implement the contrived topologies of existing DHTs, but more generalizable topologies like Euclidean or hyperbolic geometries.
 We show in Section \ref{sec:experiments} that DGVH works in all of these spaces.
-DGVH only needs the following functions to be defined in order for nodes to perform lookup operations and determine responsibility.
+DGVH only needs the distance function to be defined in order for nodes to perform lookup operations and determine responsibility.
+%TODO This is where we need to match vocab
+%\begin{itemize}
+%	\item \textbf{A \texttt{distance} function } - This measures distance in the overlay formed by the Distributed Hash Table.
+%	In most DHTs, the distance in the overlay has no correlation with real-world attributes.
+%	
+%	\item \textbf{A \texttt{responsibility} definition}  This defines the range of keys a node is responsible for. 
+%	Not every DHT defines which node is responsible for particular keys in the same way. 
+%	For example, nodes in Kademlia are responsible for the keys closest to themselves, while in Chord, nodes are responsible for the keys falling between themselves and the preceding node.
+%\end{itemize}
+We will now show how we used this information and heuristic to create UrDHT, our abstract model for distributed hash tables.
 
-
-\begin{itemize}
-	\item \textbf{A \texttt{distance} function } - This measures distance in the overlay formed by the Distributed Hash Table.
-	In most DHTs, the distance in the overlay has no correlation with real-world attributes.
-	
-	\item \textbf{A \texttt{responsibility} definition}  This defines the range of keys a node is responsible for. 
-	Not every DHT defines which node is responsible for particular keys in the same way. 
-	For example, nodes in Kademlia are responsible for the keys closest to themselves, while in Chord, nodes are responsible for the keys falling between themselves and the preceding node.
-\end{itemize}
-
-We will now show how we used this information and algorithms to create UrDHT, our abstract model for  distributed hash tables.
 
 
 
@@ -318,8 +317,8 @@ We will now show how we used this information and algorithms to create UrDHT, ou
 \label{sec:urdht}
 
 
-The name of UrDHT comes from the the German prefix \textit{ur}, which means ``original.'' 
-Our name states that all DHTs can spring from UrDHT.
+The name UrDHT comes from the German prefix \textit{ur}, which means ``original.'' 
+The name is inspired by UrDHT's ability to reproduce the topology of other distributed hash tables.
 
 UrDHT is divided into 3 broad components: Storage, Networking, and Logic.
 Storage handles file storage and Networking dictates the protocol for how nodes communicate.
@@ -338,7 +337,7 @@ We discuss each in further detail below.
 \label{sec:protocol}
 
 The DHT Protocol (\texttt{LogicClass.py}) \cite{urdht} is the shared functionality between every single DHT.
-It consists of the node's information, the short peer list that defines the overlay, the long peers that make efficient routing possible, and all the functions that use them.
+It consists of the node's information, the short peer list that defines the minimal overlay, the long peers that make efficient routing possible, and all the functions that use them.
 There is no need for a developer to change anything in the DHT Protocol, but it can be modified if so desired.
 The DHT Protocol depends on functions from Space Math in order to perform operations within the specified space.
 
@@ -346,97 +345,88 @@ Many of the function calls should be familiar to anyone who has study DHTs.
 We will discuss a few new functions we added and the ones that contribute to node maintenance.
 
 
-%TODO Further justify lookup
+
 The first thing we note is the absence of \texttt{lookup}.
 In our efforts to further abstract DHTs, we have replaced \texttt{lookup} using the function \texttt{seek}.
 The \texttt{seek} function acts a single step of \texttt{lookup}.
 It returns the closest node to $ key $ that the node knows about.
+
 Nodes can perform \texttt{lookup} by iteratively calling \texttt{seek} until it receives the same answer twice.
+We do this because we make no assumptions as to how a client using a DHT would want to perform lookups and handle errors that can occur.
+It also means that a single client implementing \texttt{lookup} using iterative \texttt{seek} operations could traverse any DHT topology implemented with UrDHT.
 
-
-The \texttt{join} operation takes in a set of bootstrap nodes, called $ candidates $, rather than a single node.
-This is part of our plans about how UrDHT can be used as a bootstrap network by providing bootstrapping information for a particular network.
-We expect nodes that want to join a particular network to be able to query UrDHT and receive a list of nodes that they can use to bootstrap the joining.
-
-The joining node randomly selects one of these $ candidates $ and finds the ``parent'' node currently responsible for the space.
-The joining node then populates its short peers using the ``parent'' node's short peers.
-The node  uses the parent to populate its short peer list and then makes it aware of its existence using \texttt{notify}.
-Once that has been finished, the joining node starts its maintenance thread.
-
-
+%We also slightly modified the assumptions of how \texttt{join} works.
+%The \texttt{join} operation takes in a set of bootstrap nodes, called $ candidates$, rather than a single node.
+%%This is part of our plans about how UrDHT can be used as a bootstrap network by providing bootstrapping information for a particular network.
+%%We expect nodes that want to join a particular network to be able to query UrDHT and receive a list of nodes that they can use to bootstrap the joining.
+%
+%The joining node randomly selects one of these $ candidates $ and finds the ``parent'' node currently responsible for the space.
+%The joining node then populates its short peers using the ``parent'' node's short peers.
+%The node  uses the parent to populate its short peer list and then makes it aware of its existence using \texttt{notify}.
+%Once that has been finished, the joining node starts its maintenance thread.
+%
+%
 
 
 Maintenance is done via gossip.
-Each maintenance cycle, the node recalculates its Delaunay (short) peers using its neighbor's peer list and any nodes that have notified it since the last maintenance cycle.
-This is done using DGVH by default, but could be done with some other algorithm.
-Once those are calculated, the node handles modifying its long peers, as dictated by the \texttt{handleLongPeers} function described in Section \ref{sec:space}.
+Each maintenance cycle, the node recalculates its Delaunay (short) peers using its neighbors' peer lists and any nodes that have notified it since the last maintenance cycle.
+Short peer selection are done using DGVH by default.
+While DGVH has worked in every single space we have tested, this is not proof it will work in every single case.
+It is reasonable and expected that some spaces may require a different Delaunay Triangulation calculation or approximation method.
+
+Once the short peers are calculated, the node handles modifying its long peers.
+This is done using the \texttt{handleLongPeers} function described in Section \ref{sec:space}.
 
 \subsection{The Space Math}
 \label{sec:space}
 The Space Math consists of the functions that define the DHT's topology.
 It requires a way to generate short peers to form a routable overlay and a way to choose long peers.
-We use DGVH for generating short peers, which works in every space tested.
+%We use DGVH for generating short peers, which works in every space tested.
 Space Math requires the following functions when using DGVH:
 
 \begin{itemize}
 
 %\subsubsection{IDToPoint}
 \item The \texttt{idToPoint} function takes in a node's ID and any other attributes needed to map an ID onto a point in the space.
-
-In the vast majority of DHTs, this \texttt{idToPoint} function needs nothing more than the ID as input.
-The ID is directly translated into a large integer and used as a coordinate in a one dimensional space.
+The ID is generally a large integer generated by a cryptographic hash function.
+%In the vast majority of DHTs, this \texttt{idToPoint} function needs nothing more than the ID as input.
+%The ID is directly translated into a large integer and used as a coordinate in a one dimensional space.
 
 
 %\subsubsection{Distance}
 \item The \texttt{distance} function takes in two points, $a$ and $b$, and outputs the shortest distance from $a$ to $b$.
-This distinction matters since distance is not symmetric in every DHT.
-The prime example of this is Chord, which is a unidirectional toroidal ring.
+This distinction matters, since distance is not symmetric in every space.
+The prime example of this is Chord, which operates in a unidirectional toroidal ring.
 
 
 
 %\subsubsection{Get Closest}
-\item The function \texttt{getClosest} returns the point closest to $ center$ from a list of $ candidates$, measured by the distance function.
-Depending on what you want to measure, \texttt{getClosest} might measure the distance from $ center$ to each of the candidates or from each of the candidates to the $ center$.
+%Depending on what you want to measure, \texttt{getClosest} might measure the distance from $ center$ to each of the candidates or from each of the candidates to the $ center$.
 
 %\subsubsection{Get Delaunay (short) Peers}
-\item We use the above functions to implement  \texttt{getDelaunayPeers}.
-Given a set of points, the $ candidates$, and a center point $ centers$, \texttt{getDelaunayPeers} calculates a mesh that is made up of the Delaunay peers of $ center$.
+\item We use the above functions to implement \texttt{getDelaunayPeers}.
+Given a set of points, the $ candidates$, and a center point $ centers$, \texttt{getDelaunayPeers} calculates a mesh that approximates the Delaunay peers of $ center$.
+We assume that this is done using DGVH (Algorithm \ref{alg:dgvh}).
 
-We assume that this is done using DGVH, shown by the Python code 
-in Listing \ref{lst:dgvh}
 
-%TODO I don't see any minimums here
-%TOD Put minimum in here
-\begin{lstlisting}[basicstyle=\scriptsize\ttfamily,  breaklines=true, caption={\texttt{getDelaunayPeers()}}, label={lst:dgvh}, frame=single] 
-def getDelaunayPeers(candidates,center):    
-	if len(candidates) < 2:
-		return candidates
-	sortedCandidates = sorted(candidates, key=lambda x: distance(x, center))
-	peers = [sortedCandidates[0]] 
-	sortedCandidates = sortedCandidates[1:]
-	for c in sortedCandidates:
-		accept = True
-		for p in peers:
-			if distance(c,p) < distance(c,center):
-				accept = False
-				break
-		if accept:
-			peers.append(c)
-	return peers
-\end{lstlisting}
+
+\item The function \texttt{getClosest} returns the point closest to $ center$ from a list of $ candidates$, measured by the distance function.
+The \texttt{seek} operation depends on the \texttt{getClosest} function.
 
 
 %\subsubsection{Handle Long Peers}
 
-\item The final function is \texttt{handleLongPeers}.
-\texttt{handleLongPeers} takes in a list of $ candidates $ and a $ center$, much like \texttt{getDelaunayPeers}, and returns a set of peers to act as routing shortcuts.
 
+
+\item The final function is \texttt{handleLongPeers}.
+\texttt{handleLongPeers} takes in a list of $ candidates $ and a $ center$, much like \texttt{getDelaunayPeers}, and returns a set of peers to act as the routing shortcuts.
 
 The implementation of this function should vary greatly from one DHT to another.
-For example, Symphony \cite{symphony} and other small-world \cite{kleinberg2000navigation} networks choose long peers using a probability distribution.
+For example, Symphony \cite{symphony} and other small-world networks \cite{kleinberg2000navigation} choose long peers using a probability distribution.
 Chord has a much more structured distribution, with each long peer being increasing powers of 2 distance away from the node \cite{chord}.
-
-
+The default behavior is to use all candidates not chosen as short peers as long peers, up to a set maximum.
+If the size of long peers would exceed this maximum, we instead choose a random subset of the maximum size, creating a naive approximation of the long links in the Kleinberg small-world model \cite{kleinberg2000navigation}.
+Long peers do not greatly contribute to maintenance overhead, so we chose 200 long peers as a default maximum.
 
 %In some case it may more convenient implement \texttt{handleLongPeers} as part of \texttt{getDelaunayPeers}.
 
@@ -454,10 +444,10 @@ Chord has a much more structured distribution, with each long peer being increas
 \label{sec:implement}
 \subsection{Implementing Chord}
 
-Ring topologies are fairly straightforward since they act as are one dimensional Voronoi tessellations, splitting up what is effectively a modular number line among multiple nodes.
+Ring topologies are fairly straightforward since they are one dimensional Voronoi Tessellations, splitting up what is effectively a modular number line among multiple nodes.
 
 Chord uses a unidirectional distance function.
-Given two integer keys $ a $ and $ b $ and a maximum value $ 2^{m} $, the \texttt{distance} from $ a $ to $ b $ in Chord's unidirectional ring is: 
+Given two integer keys $ a $ and $ b $ and a maximum value $ 2^{m}$, the \texttt{distance} from $ a $ to $ b $ in Chord is: 
 \[ distance(a,b) =
 \begin{cases}
 	2^m + b - a, & \text{if } b - a < 0 \\
@@ -466,7 +456,7 @@ Given two integer keys $ a $ and $ b $ and a maximum value $ 2^{m} $, the \textt
   \]
 
 
-Short peer selection is trivial in chord, so rather than using DGVH for \texttt{getDelaunayPeers}, each node chooses  from the list of candidates the candidate closest to it (predecessor) and the candidate it is closest to (successor).
+Short peer selection is trivial in Chord, so rather than using DGVH for \texttt{getDelaunayPeers}, each node chooses from the list of candidates the candidate closest to it (predecessor) and the candidate to which it is closest (successor).
 
 Chord's finger (long peer) selection strategy is emulated by \texttt{handleLongPeers}.
 For each of the $i$th bits in the hash function, we choose a long peer $ p_i $ from the candidates such that 
@@ -477,6 +467,12 @@ where
 \[t_{i} =  (n + 2^{i}) \mod 2^m \]
 for the current node $n$.
 The \texttt{getClosest} function in Chord should return the candidate with the shortest distance from the candidate to the point.
+
+This differs slightly from how selects its long peers.
+In Chord, nodes actively seek out the appropriate long peer for each  corresponding bit.
+In our emulation, this information is propagated along the ring using short peer gossip.
+
+
 %for i in range(0, HASHBASE):
 %target = tuple([(center[0] + 2**i) % HASHMAX])
 %subject = min(others, key=lambda x: chordDist(x.loc, target))
@@ -485,17 +481,17 @@ The \texttt{getClosest} function in Chord should return the candidate with the s
 
 \subsection{Implementing Kademlia}
 Kademlia uses the exclusive or, or XOR, metric for distance.
-This metric, while non-euclidean, is perfectly acceptable for calculating distance in Kademlia \cite{kademlia}.
+This metric, while non-euclidean, is perfectly acceptable for calculating distance.
 For two given keys $ a $ and $ b $
 
-\[ disance(a, b) = a  \oplus b\]
+\[ distance(a, b) = a  \oplus b\]
 
 The \texttt{getDelaunayPeers} function uses DGVH as normal to choose the short peers for node $n$.
 We then used Kademlia's $k$-bucket strategy \cite{kademlia} for \texttt{handleLongPeers}.
 The remaining candidates are placed into buckets, each capable holding a maximum of $k$ long peers.
 
-To summarize briefly, node $n$ starts with a single bucket containing $n$, covering long peers for the entire range.
-When attempting to add a candidate to a bucket already containing $k$ long peers, if the bucket contains node $n$, the bucket is split into two buckets, each covering half of that buckets range.
+To summarize briefly, node $n$ starts with a single bucket containing itself, covering long peers for the entire range.
+When attempting to add a candidate to a bucket already containing $k$ long peers, if the bucket contains node $n$, the bucket is split into two buckets, each covering half of that bucket's range.
 Further details of how Kademlia $k$-buckets work can be found in the Kademlia protocol paper \cite{kademlia}.
 
 
@@ -504,12 +500,12 @@ ZHT \cite{li2013zht} leads to an extremely trivial implementation in UrDHT.
 Unlike other DHTs, ZHT assumes an extremely low rate of churn.
 It bases this rationale on the fact that tracking $ O(n) $ peers in memory is trivial.
 This indicates the $ O( \log n)  $  memory  requirement for other DHTs is overzealous and not based on a memory limitation.
-Rather, the primary motivation for keeping a limited subset of the network in memory is more due to the cost of maintenance messages.
+Rather, the primary motivation for keeping a number of peers in memory is more due to the cost of maintenance overhead.
 ZHT shows, that by assuming low rates of churn (and infrequent maintenance messages as a result), having $O(n)$ peers is a viable tactic for faster lookups.
 
-As a result, the topology of ZHT is a clique, with each node having an edge to all other nodes, yielding $ O(1) $ lookup times with an $ O(n) $ memory cost.
-%
-The only change that needs to be made is to consider all peer candidates to be short peers.
+As a result, the topology of ZHT is a clique, with each node having an edge to all other nodes.
+This yields $ O(1) $ lookup times with an $ O(n) $ memory cost.
+The only change that needs to be made to UrDHT is to accept all peer candidates as short peers.
 
 \subsection{Implementing a DHT in a non-contrived Metric Space}
 
