@@ -66,7 +66,7 @@ For example, we implemented a DHT operating in a hyperbolic geometry, a previous
 
 
 
-UrDHT is an abstract model of a distributed hash table (DHT). %that solves a number of problems.
+We present UrDHT, an abstract model of a distributed hash table (DHT). %that solves a number of problems.
 It is a unified and cohesive model for creating DHTs and P2P applications based on DHTs.
 %UrDHT also provides a single network for bootstrapping distributed applications.
 %Third, we show that using the abstraction features of UrDHT, we can embed latency into the DHT's overlay.
@@ -566,29 +566,95 @@ Using simulations to test the correctness and relative performance of DHTs is st
 Our experiments demonstrate that topologies implemented using UrDHT converge to a routable mesh.
 We demonstrate that lookup operations in these meshes can be done in sublinear time.
 
-Tests
-k connected randomly populated network
-vars:
-k for your k connected network 10, 20
-duration what we have works
-size 100, 500, 1000, 5000 if possible,
+%Tests
+%k connected randomly populated network
+%vars:
+%k for your k connected network 10, 20
+%duration what we have works
+%size 100, 500, 1000, 5000 if possible,
+%
+%Iterative joins, start with one node
+%vars:  join rate (ticks per join) ,1 3 
+%final size  100, 500, 1000, 5000 if possible,
+%join method (bootstrapping size)  all,
+%
+%outputs
+%Network diameter at tick
+%avg greedy routing distance
+%greedy routing success rate at tick
+%maximum degree
+%mean degree
+%std deviatation degree
+%Anything we want for degree
+%
+%
+%Graph max degree vs expected  maximimum degree  (this is short peers)
 
-Iterative joins, start with one node
-vars:  join rate (ticks per join) ,1 3 
-final size  100, 500, 1000, 5000 if possible,
-join method (bootstrapping size)  all,
+\subsection{Experimental Setup}
+We tested four different topologies: Chord, Kademlia,  a Euclidean geometry, and a Hyperbolic geometry.
+We created 500 node networks, starting with a single node and adding a node each maintence cycle.\footnote{We varied the amount of maintenance cycles between joins in our experiments, but found it had no effect upon our results.}
 
-outputs
-Network diameter at tick
-avg greedy routing distance
-greedy routing success rate at tick
-maximum degree
-mean degree
-std deviatation degree
-Anything we want for degree
+For each topology, at each step, we measured
+\begin{itemize}
+	\item The average degree of the network
+	\item The worst case degree of the network
+	
+\end{itemize}
 
 
-Graph max degree vs expected  maximimum degree  (this is short peers)
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{figs/ChordDegree}
+\caption{This is the average and maximum degree of nodes in the network.}
+\label{fig:ChordDegree}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{figs/ChordDistance}
+\caption{yes}
+\label{fig:ChordDistance}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{figs/EucldianDegree}
+\caption{yes}
+\label{fig:EucldianDegree}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{figs/EucldianDistance}
+\caption{yes}
+\label{fig:EucldianDistance}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{figs/HyperbolicDegree}
+\caption{yes}
+\label{fig:HyperbolicDegree}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{figs/HyperbolicDistance}
+\caption{yes}
+\label{fig:HyperbolicDistance}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{figs/KademliaDegree}
+\caption{yes}
+\label{fig:KademliaDegree}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{figs/KademliaDistance}
+\caption{yes}
+\label{fig:KademliaDistance}
+\end{figure}
+
+
+
+
+
 
 
 
@@ -625,7 +691,7 @@ We showed in worked in DGVH, it should work in a hyperbolic space.
 \label{sec:future}
 
 %Restate the intro
-UrDHT is a unified model for DHTs and framework for building distributed applications.
+We presented UrDHT, a unified model for DHTs and framework for building distributed applications.
 We have shown how it possible to use UrDHT to not only implement traditional DHTs such as Chord and Kademlia, but also in much more generalized spaces such as Euclidean and Hyperbolic geometries.
 
 
@@ -648,7 +714,7 @@ This is done for purposes of load balancing and fault tolerance.
 For future work, we want to see if there is a means of embedding latency into the DHT, while still maintaining the system's fault tolerance.
 Doing so would mean that the hops traversed to a destination are, in fact, the shortest path to the destination.
 
-We believe we can embed a latency graph in a hyperbolic space and define UrDHT such that it operates within this space \cite{kleinberg2007geographic} \cite{cvetkovski2009hyperbolic}..
+We believe we can embed a latency graph in a hyperbolic space and define UrDHT such that it operates within this space \cite{kleinberg2007geographic} \cite{cvetkovski2009hyperbolic}.
 The end result would be a DHT with latency embedded into the overlay.
 Nodes would respond to changes in latency and the network by rejoining the network at new positions.
 This approach would maintain the decentralized strengths of DHTs, while reducing overall delay and communication costs.
