@@ -36,10 +36,10 @@
 Distributed Hash Tables (DHTs) have an inherent set of qualities, such as greedy routing, maintaining lists of peers which define the topology, and form an overlay network.
 Rather than having a developer be concerned with the details of a given DHT, we have constructed a new framework, UrDHT, that generalizes the functionality and implementation of various DHTs.
 
-UrDHT is an abstract model of a Distributed Hash Table.
+UrDHT is an abstract model of a Distributed Hash Table that implements a self-organizing web of computational units.
 It maps the topologies of DHTs to the primal-dual problem of Voronoi Tessellation and Delaunay Triangulation.
 By completing a few simple functions, a developer can implement the topology of any DHT in any arbitrary space using UrDHT.
-For example, we implemented a DHT operating in a hyperbolic space, a previously unexplored nontrivial metric space with potential applications, such as latency embedding.
+For example, we implemented a DHT operating in a hyperbolic geometry, a previously unexplored nontrivial metric space with potential applications, such as latency embedding.
 
 %Latency embedding will not be included in this paper
 %One topology of particular interest we created is a DHT operating within a Poincar\'{e} disk model.
@@ -50,7 +50,7 @@ For example, we implemented a DHT operating in a hyperbolic space, a previously 
 \end{abstract}
 
 \begin{IEEEkeywords}
-	Peer-to-Peer Networks;  Distributed Hash Tables; Computational Geometry; Delaunay Triangulation; Voronoi Tessellation
+	Peer-to-Peer Networks;  Distributed Hash Tables; Computational Geometry; Delaunay Triangulation; Voronoi Tessellation; Self-Organizing Networks;
 	
 \end{IEEEkeywords}
 
@@ -76,16 +76,16 @@ It is a unified and cohesive model for creating DHTs and P2P applications based 
 Distributed Hash Tables have been the catalyst for the creation of many P2P applications.
 Among these are Redis \cite{redis}, Freenet \cite{freenet}, and, most notably, BitTorrent \cite{bittorrent}. 
 All DHTs use functionally similar protocols to perform lookup, storage, and retrieval operations.
-Despite this, no one has created a cohesive formal specification for building a DHT.
+Despite this, no one has created a cohesive formal DHT specification.
 
 Our primary motivation for this project was to create an abstracted model for Distributed Hash Tables based on observations we made during previous research \cite{dgvh}.
 We found that all DHTs can cleanly be mapped to the primal-dual problems of Voronoi Tessellation and Delaunay Triangulation.
 
+%TODO Match vocabulary
 UrDHT builds its topology directly upon this insight.
 It uses a greedy distributed heuristic for approximating Delaunay Triangulations.
-UrDHT is our specification of an abstract DHT, which can be used to build many different DHTs.
-We found that we could reproduce the topology of different DHTs by defining a selection heuristic and rejection algorithm for the geometry the DHT operates within.
-For every DHT we implemented, our greedy approximation of Delaunay Triangulation produced a stable DHT, regardless of the geometry the DHT.  
+We found that we could reproduce the topology of different DHTs by defining a selection heuristic and rejection algorithm for the geometry the DHT.
+For every DHT we implemented, our greedy approximation of Delaunay Triangulation produced a stable DHT, regardless of the geometry.  
 This works in non-Euclidean geometries such as XOR (Kademlia) or even a hyperbolic geometry represented by a Poincar\`{e} disc.
 
 The end result is not only do we have an abstract model of DHTs, we have a simple framework that developers can use to quickly create new distributed applications.
@@ -112,15 +112,16 @@ To summarize our contributions:
 	While there has long existed a well known protocol shared by distributed hash tables, this defines what a DHT does.
 	It does not describe what a DHT is.
 	
-	We show that DHTs cleanly map to the primal-dual problem of Delaunay triangulations and Voronoi tessellations.
+	We show that DHTs cleanly map to the primal-dual problem of Delaunay Triangulation and Voronoi Tessellation.
 	We list a set of simple functions that, once defined, allow our Distributed Greedy Voronoi Heuristic (DGVH) to be run in any space, creating a DHT overlay for that space (Section \ref{sec:define}).
 	
-	\item We present UrDHT as an abstract DHT and show how a developer can tweak the functions we defined to create an arbitrary new DHT topology (Section \ref{sec:urdht}).
+	\item We present UrDHT as an abstract DHT and show how a developer would modify the functions we defined to create an arbitrary new DHT topology (Section \ref{sec:urdht}).
+	
 	\item We show how to reproduce the topology of Chord and Kademlia using UrDHT.
-	We also implement a DHT in a hyperbolic geometry represented  by a Poincar\`{e} disc (Section \ref{sec:implement}).
+	We also implement a DHT in a Euclidean geometry and a hyperbolic geometry represented by a Poincar\`{e} disc (Section \ref{sec:implement}).
 %	We also discuss how we can use UrDHT to run subnetworks as a service.
-	\item We conduct experiments that show building DHTs using UrDHT produced efficiently routable network topologies, no matter what geometry the overlay topology  is based in (Section \ref{sec:experiments}). 
-	\item We discuss the ramifications of our work and what future work is available.
+	\item We conduct experiments that show building DHTs using UrDHT produced efficiently routable networks, regardless of the underlying geometry(Section \ref{sec:experiments}). 
+	\item We discuss the ramifications of our work and what future work is available (Section \ref{sec:future}).
 \end{itemize}
 
 
@@ -128,29 +129,31 @@ To summarize our contributions:
 \label{sec:define}
 
 A distributed hash table is usually defined by its protocol; in other words, what it can do.
-Nodes and data in a DHT are assigned unique\footnote{Unique with astronomically high probability, given a large enough consistent hash algorithm.} keys via a consistent hashing algorithm.
+Nodes and data in a DHT are assigned unique\footnote{Unique with astronomically high probability, given a large enough consistent hashing algorithm.} keys via a consistent hashing algorithm.
 To make it easier to intuitively understand the context, we will call the key associated with a node its ID and refer to nodes and their IDs interchangeably.
 
-A DHT can perform the \texttt{lookup(key)}, \texttt{get(key)}, and \texttt{store(key, value)} operations.\footnote{There is typically a \textit{delete(key)} operation defined too, but it is not strictly necessary.}
+A DHT can perform the \texttt{lookup(key)}, \texttt{get(key)}, and \texttt{store(key, value)} operations.\footnote{There is typically a \textit{delete(key)} operation too, but it is not strictly necessary.}
 The \texttt{lookup} operation returns the node responsible for a queried key.
 The \texttt{store} function stores that key/value pair in the DHT, while \texttt{get} returns the value associated with that key.
 
-However, this is what a DHT \textit{does}, viewing the DHT as a black box, not what a DHT \textit{is} and needs to be implemented.
-We show that Distributed Hash Tables are essentially Voronoi Tessellations and Delaunay Triangulations.
+However, these operations define the functionality of a DHT, but do not define the requirements for implementation.
+We define the necessary components that comprise DHTs.
+We show that these components are essentially Voronoi Tessellation and Delaunay Triangulation.
 
 \subsection{DHTs, Delaunay Triangulation, and Voronoi Tessellation}
 
-Nodes in different DHTs have, what appears at the first glance, wildly disparate ways of keeping track of peers, the other nodes in the network.
+Nodes in different DHTs have, what appears at the first glance, wildly disparate ways of keeping track of peers - the other nodes in the network.
 However, peers can be split into two groups.
 
 The first group is the \textit{short peers}.
-These are the closest peers to the node and, as such, define the range of keys the node is responsible for. 
-A node is responsible for a key if and only if its ID is closest to the given key in the geometry of the DHTs.
+These are the closest peers to the node and define the range of keys the node is responsible for. 
+A node is responsible for a key if and only if its ID is closest to the given key in the geometry of the DHT.
 Short peers define the DHTs topology and guarantee that the greedy routing algorithm shared by all DHTs works.
 
 
 %All other peers comprise the \textit{long peers}.
-Long peers are the nodes that allow a DHT to achieve sublinear routing speeds, typically $ \log(n) $ hops.
+Long peers are the nodes that allow a DHT to achieve faster routing speeds than the topology would allow using only short peers.
+This is typically $ O(\log(n)) $ hops, although polylogarithmic time is acceptable \cite{kleinberg2000small}.
 A DHT can still function without long peers.
 
 Interestingly, despite the diversity of DHT topologies and how each DHT organizes short and long peers,  all DHTs use functionally identical greedy routing algorithms (Algorithm \ref{alg:routing}):
@@ -182,10 +185,10 @@ If I, the node, am responsible for the key, I return myself.
 Otherwise, if I know who is responsible for this key, I return that node.
 Finally, if that is not the case, I forward this query to the node I know with shortest distance from the node to the desired key.\footnote{This order matters, as some DHTs such as Chord are unidirectional.} 
 
-Between individual DHTs, this algorithm might be implemented either recursively or iteratively.
-It will certainly have differences in how a node handles errors, such as how to handle connecting to a failed node that no longer exists.
-This algorithm may possibly be  run in parallel, such as in Kademlia \cite{kademlia}.
-Despite this, the base greedy algorithm is always the same between implementations.
+Depending of the specific DHT, this algorithm might be implemented either recursively or iteratively.
+It will certainly have differences in how a node handles errors, such as how to handle connecting to a node that no longer exists.
+This algorithm may possibly be run in parallel, such as in Kademlia \cite{kademlia}.
+The base greedy algorithm is always the same regardless of the implementation.
 
 
 \begin{figure}
@@ -196,21 +199,24 @@ Despite this, the base greedy algorithm is always the same between implementatio
 \end{figure}
 
 
-With the components of a DHT defined above we can now show the relationship between DHTs and the primal-dual problems of Delaunay Triangulation and Voronoi Tessellation.
+With the components of a DHT defined above, we can now show the relationship between DHTs and the primal-dual problems of Delaunay Triangulation and Voronoi Tessellation.
+An example Delaunay Triangulation and Voronoi Tessellation is show in Figure \ref{voro-ex}.
 
-We can map a given node's ID to a point in a space and the set of short peers to the Delaunay triangulation.
+%TODO A one-dimensional voronoi fig as example
+We can map a given node's ID to a point in a space and the set of short peers to the Delaunay Triangulation.
 This would make the range of keys a node is responsible correspond to the node's Voronoi region.
-Long peers serve as shortcuts across the mesh formed by Delaunay triangulations.
+Long peers serve as shortcuts across the mesh formed by Delaunay Triangulation.
 
 
 Thus, if we can calculate the Delaunay triangulation between nodes in a DHT, we have a generalized means of creating the overlay network.
 This can be done with any algorithm that calculates the Delaunay Triangulation.
 
-Computing the Delaunay Triangulation and/or the Voronoi Tesselation of a set of points is a well analyzed problem.
-Many algorithms exist which efficiently compute a Voronoi tessellation for a given set of points on a plane, such as Fortune's sweep line algorithm \cite{fortune1987sweepline}.
+Computing the Delaunay Triangulation and/or the Voronoi Tessellation of a set of points is a well analyzed problem.
+Many algorithms exist which efficiently compute a Voronoi Tessellation for a given set of points on a plane, such as Fortune's sweep line algorithm \cite{fortune1987sweepline}.
 
-However, DHTs are distributed and many of the algorithms to compute Delaunay Triangulation and/or Delaunay Triangulation are unsuited to a distributed environment.
-In addition, the computation cost increases when we move into spaces with greater than two dimensions.
+However, DHTs are completed decentralized, with no single node having global knowledge of the topology.
+Many of the algorithms to compute Delaunay Triangulation and/or Voronoi Tessellation are unsuited to a distributed environment.
+In addition, the computational cost increases when we move into spaces with greater than two dimensions.
 In general, finding the Delaunay Triangulation of $n$ points in a space with $d$ dimensions takes $O(n^{\frac{2d-1}{d}})$ time \cite{watson1981computing}.
 
 
@@ -465,9 +471,8 @@ Short peer selection is trivial in chord, so rather than using DGVH for \texttt{
 Chord's finger (long peer) selection strategy is emulated by \texttt{handleLongPeers}.
 For each of the $i$th bits in the hash function, we choose a long peer $ p_i $ from the candidates such that 
 
-%TODO My mathfu is weak I need help
 
-\[ p_i = \left\{c \in Candidates |  \min\left(distance(c, t_{i})\right) \right\}  \]
+\[ p_i =   getClosest\left(candidates, t_{i}\right)  \]
 where
 \[t_{i} =  (n + 2^{i}) \mod 2^m \]
 for the current node $n$.
