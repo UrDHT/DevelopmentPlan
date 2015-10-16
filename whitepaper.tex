@@ -563,9 +563,6 @@ This has the potential to allow for minimal latency DHTs.
 We use simulations to test our implementations of DHTs using UrDHT.
 Using simulations to test the correctness and relative performance of DHTs is standard practice for testing and analyzing DHTs \cite{kademlia} \cite{chord} \cite{tapestry} \cite{symphony} \cite{raynet} \cite{li2005comparing}.
 
-Our experiments demonstrate that topologies implemented using UrDHT converge to a routable mesh.
-We demonstrate that lookup operations in these meshes can be done in sublinear time.
-
 %Tests
 %k connected randomly populated network
 %vars:
@@ -590,102 +587,108 @@ We demonstrate that lookup operations in these meshes can be done in sublinear t
 %
 %Graph max degree vs expected  maximimum degree  (this is short peers)
 
-\subsection{Experimental Setup}
+%\subsection{Experimental Setup}
 We tested four different topologies: Chord, Kademlia,  a Euclidean geometry, and a Hyperbolic geometry.
-We created 500 node networks, starting with a single node and adding a node each maintence cycle.\footnote{We varied the amount of maintenance cycles between joins in our experiments, but found it had no effect upon our results.}
+For Kademlia, the size of the $k$-buckets was 3.
+In the Euclidean and Hyperbolic geometries, we set a minimum of 7 short peers and 49 long peers.
 
-For each topology, at each step, we measured
+We created 500 node networks, starting with a single node and adding a node each maintenance cycle.\footnote{We varied the amount of maintenance cycles between joins in our experiments, but found it had no effect upon our results.}
+
+For each topology, at each step, we measured:
 \begin{itemize}
-	\item The average degree of the network
-	\item The worst case degree of the network
-	
+	\item The average degree of the network.  This is the  number of outgoing links and includes both short and long peers.
+	\item The worst case degree of the network.
+	\item The average number of hops between nodes using greedy routing.
+	\item The diameter of the network.  
+	This is the worst case distance between two nodes using greedy routing.
 \end{itemize}
 
+We also tested the reachability of nodes in the network.
+At every step, the network is fully reachable.
+
+
+Our results show that Chord and Kademlia show results which correspond that are expected from previous experiments \cite{chord} \cite{kademlia}.
+This demonstrates that UrDHT is capable of accurately emulating these topologies.
+We show these results in Figures \ref{fig:ChordDegree} - \ref{fig:KademliaDistance}.
+
+
 
 \begin{figure}
-\centering
-\includegraphics[width=0.7\linewidth]{figs/ChordDegree}
-\caption{This is the average and maximum degree of nodes in the network.}
-\label{fig:ChordDegree}
+	\centering
+	\includegraphics[width=0.7\linewidth]{figs/ChordDegree}
+	\caption{This is the average and maximum degree of nodes in the Chord network. This Chord network utilized a 120 bit hash and thus degree is bound at 122 (full fingers, predecessor and successor) when the network reaches $2^{120}$ nodes.}
+	\label{fig:ChordDegree}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\linewidth]{figs/ChordDistance}
+	\caption{This is the number hops required for a greedy routed lookup in Chord. The average lookup between two nodes follows the expected logarithmic curve.}
+	\label{fig:ChordDistance}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\linewidth]{figs/KademliaDegree}
+	\caption{This is the average and maximum degree of nodes in the Kademlia network as new nodes are added.  Both the maximum degree and average degree are $O(\log n)$}
+	\label{fig:KademliaDegree}
 \end{figure}
 \begin{figure}
-\centering
-\includegraphics[width=0.7\linewidth]{figs/ChordDistance}
-\caption{yes}
-\label{fig:ChordDistance}
+	\centering
+	\includegraphics[width=0.7\linewidth]{figs/KademliaDistance}
+	\caption{Much like Chord, the average degree follows a distinct logarithmic curve, reaching an average distance of approximately three hops when there are 500 nodes in the network.}
+	\label{fig:KademliaDistance}
 \end{figure}
-\begin{figure}
+
+
+
+The results of our Euclidean and Hyperbolic geometries indicate similar asymptotic behavior: a higher degree produces a lower diameter and average routing. 
+However, the ability to leverage this trade-off is limited by the necessity of maintaining an $ O(\log n $) degree
+These results are shown in Figures \ref{fig:EucldianDegree} - \ref{fig:HyperbolicDistance}.
+
+While we maintain the number of links must be $ O(\log n) $, all DHTs practically bound this number by a constant.  
+For example, in Chord, this is the number of bits in the hash function plus the number of predecessors/successors.
+Chord and Kademlia fill this bound asymptotically, whereas the long peer strategy used by the Euclidean and Hyperbolic metrics aggressively filled to this capacity, relying on the distribution of long peers to change as the network increased in size.
+This explains why the Euclidean and Hyperbolic spaces have more peers (and thus lower diameter) for a given network size.
+This presents a strategy for trade-off of the network diameter vs the overhead maintenance cost.
+
+
+%\subsection{Chord}
+%Our model of Chord
+%\cite{chord}.
+
+
+\begin{figure}[h]
 \centering
 \includegraphics[width=0.7\linewidth]{figs/EucldianDegree}
-\caption{yes}
+\caption{Because the long peers increase linearly to the maximum value (49), degree initially rises quickly and then grows  more slowly as the number of long peers ceases to grow and the size short peers increases with network size. }
 \label{fig:EucldianDegree}
 \end{figure}
-\begin{figure}
+
+\begin{figure}[h]
 \centering
 \includegraphics[width=0.7\linewidth]{figs/EucldianDistance}
-\caption{yes}
+\caption{The inter-node distance stays constant at 1 until long peers are filled, then rises at the rate of a randomly connected network due to the distribution of long peers selected}
 \label{fig:EucldianDistance}
 \end{figure}
-\begin{figure}
+
+\begin{figure}[h]
 \centering
 \includegraphics[width=0.7\linewidth]{figs/HyperbolicDegree}
-\caption{yes}
+\caption{The Hyperbolic network uses the same long and short peer strategies to the euclidean network, and thus shows similar results}
 \label{fig:HyperbolicDegree}
 \end{figure}
-\begin{figure}
+\begin{figure}[h]
 \centering
 \includegraphics[width=0.7\linewidth]{figs/HyperbolicDistance}
-\caption{yes}
+\caption{Like the Euclidean Geometry, our Poincar\`{e} disc based topology has much shorter maximum and average distances.
+}
 \label{fig:HyperbolicDistance}
 \end{figure}
-\begin{figure}
-\centering
-\includegraphics[width=0.7\linewidth]{figs/KademliaDegree}
-\caption{yes}
-\label{fig:KademliaDegree}
-\end{figure}
-\begin{figure}
-\centering
-\includegraphics[width=0.7\linewidth]{figs/KademliaDistance}
-\caption{yes}
-\label{fig:KademliaDistance}
-\end{figure}
 
 
 
 
-
-
-
-
-\subsection{Kademlia Works}
-B
-
-
-\subsection{Performance of Chord on our network module}
-
-
-
-\subsection{UrDHT Cohesion Euclidean Space}
-This experiment greatly resembles the one we performed when evaluating DGVH \cite{dgvh}.
-
-We've previously shown that higher degrees work \cite{dgvh}.
-
-\subsection{Cohesion in hyperbolic space}
-We showed in worked in DGVH, it should work in a hyperbolic space.
-
-
-
-
-%\subsection{Remarks}
-%Our experiments show that Euclidean and Hyperbolic topologies offer a distinct advantage over Chord and Kademlia.
-%Chord and Kademlia cannot create a organized network from an initially randomly connected graph.
-%Because Chord and Kademlia are highly selective in what they select in long peers, this first pass culling reduces the initially connected graph into multiple disjoint sets from which it cannot recover.
-%
-%We have demonstrated here and in our previous works that DHTs in Euclidean and Hyperbolic topologies can converge from a randomized topology. 
-%This means so long as the graph is connected
-
-%With an initial $k$-connected graph, the first step is for nodes to select short and long peers.
 
 \section{Applications and Future Work}
 \label{sec:future}
@@ -693,6 +696,7 @@ We showed in worked in DGVH, it should work in a hyperbolic space.
 %Restate the intro
 We presented UrDHT, a unified model for DHTs and framework for building distributed applications.
 We have shown how it possible to use UrDHT to not only implement traditional DHTs such as Chord and Kademlia, but also in much more generalized spaces such as Euclidean and Hyperbolic geometries.
+The viability of UrDHT to utilize Euclidean and Hyperbolic metric spaces indicates that further research into potential topologies of DHTs and potential applications of these topologies is warranted.
 
 
 %Future improvements of UrDHT would further disconnect long peers and short peers giving them their own implementation cycle.
