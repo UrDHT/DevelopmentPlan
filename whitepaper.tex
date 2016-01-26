@@ -687,8 +687,21 @@ This presents a strategy for trade-off of the network diameter vs. the overhead 
 \end{figure}
 
 
+\section{Related  Work}\label{sec:related}
+
+There have been a number of efforts to either create abstractions of DHTs or ease the development of DHTs.
 
 
+One area of previous work focused on constructing overlay networks using system called P2 \cite{p2} \cite{loo2005implementing}.
+P2 is a network engine for constructing overlays which uses the Overlog declarative logic language.
+Writing programs for P2 in Overlog yields extremely concise and modular implementations of for overlay networks. 
+
+Our work differs in that P2 attempts to abstract overlays and ease construction by using a language and framework, while UrDHT focuses on abstracting the idea of a structured overlay into Voronoi Tessellations and Delaunay Triangulations.
+This allows developers to define the overlays they are building by mathematically defining a short number of functions.
+
+
+P2 is no longer supported.
+P2's concise Overlog statements are complicated.
 
 \section{Applications and Future Work}
 \label{sec:future}
